@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG avec texte tournant, Blob animé et texte au survol</title>
+    <style>
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            height: 600vh; /* Plus de contenu pour permettre le défilement */
+            background: #000000;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        #globeViz {
+            width: 100vw; 
+            height: 100vh;
+            position: fixed; 
+            top: 0; 
+            left: 0;
+            z-index: 1;
+        }
+
+        .image-svg-container {
+            width: 10vw; /* Largeur proportionnelle à la largeur de la fenêtre */
+            height: 10vw;
+            position: fixed;
+            z-index: 2;
+            opacity: 0; /* Masqué par défaut */
+            transition: opacity 0.5s ease-in-out; /* Transition pour l'effet d'apparition */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-svg {
+            fill: rgb(255, 255, 255); /* Couleur du SVG initiale */
+            width: 25%;
+            transition: fill 0.3s ease; /* Transition pour changer la couleur au survol */
+        }
+
+        /* Blob animé sous l'icône */
+        .une-forme {
+            width: 180px; /* Largeur du blob */
+            height: 180px; /* Hauteur du blob */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .une-forme::before {
+            display: block;
+            position: absolute;
+            content: "";
+            left: calc(50% - 90px); /* Ajustement pour centrer le blob */
+            top: calc(50% - 90px);  /* Ajustement pour centrer le blob */
+            width: 180px; /* Largeur du blob */
+            height: 180px; /* Hauteur du blob */
+            border: solid 2px white;
+            border-radius: 66% 33% 66% 33% / 33% 33% 66% 66%;
+            animation: border_animation 6s linear infinite;
+            -webkit-animation: border_animation 6s linear infinite;
+            background-color: transparent; /* Initialement transparent */
+            transition: background-color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1); /* Transition plus fluide */
+        }
+
+        @keyframes border_animation {
+            0%, 100% {
+                border-radius: 44% 56% 66% 66% / 45% 45% 55% 55%;
+                transform: translate3d(0, 0, 0) rotateZ(0.01deg);
+            }
+            33% {
+                border-radius: 66% 33% 44% 55% / 33% 22% 77% 66%;
+                transform: translate3d(0, 5px, 0) rotateZ(0.01deg);
+            }
+            50% {
+                transform: translate3d(0, 0, 0) rotateZ(0.01deg);
+            }
+            66% {
+                border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+                transform: translate3d(0, -3px, 0) rotateZ(0.01deg);
+            }
+        }
+
+        /* Changement de couleur au survol */
+        .image-svg-container:hover .une-forme::before {
+            background-color: white; /* Le blob se remplit de blanc au survol */
+        }
+
+        .image-svg-container:hover .image-svg {
+            fill: black; /* Le SVG change de couleur au survol */
+            transition: fill 0.7s cubic-bezier(0.25, 0.1, 0.25, 1); /* Transition plus fluide */
+        }
+
+        .image-svg-container:hover .rotating-text p {
+            color: black; /* Le texte tournant change de couleur au survol */
+            transition: color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1); /* Transition plus fluide */
+        }
+
+        .image-svg-container:hover .une-forme #text {
+            color: black; /* Change la couleur du texte en noir au survol */
+            transition: color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1); /* Transition plus fluide */
+        }
+
+        /* Texte tournant autour du SVG */
+        .rotating-text {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none; /* Empêche le texte de capturer les clics */
+            opacity: 1; /* Le texte est visible dès que le conteneur apparaît */
+            transition: opacity 0.3s ease;
+            text-align: center;
+        }
+
+        #text {
+            color: white;
+            font-size: 2vh; /* Utilisation de vw pour une taille de texte responsive */
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        #svg1 { top: 5%; left: 50%; transform: translate(-50%, 0); } /* En haut, centré horizontalement */
+        #svg2 { top: 50%; right: 5%; transform: translate(0, -50%); } /* À droite, centré verticalement */
+        #svg3 { bottom: 5%; left: 50%; transform: translate(-50%, 0); } /* En bas, centré horizontalement */
+        #svg4 { top: 50%; left: 5%; transform: translate(0, -50%); } /* À gauche, centré verticalement */
+
+        /* Styles pour le bouton de défilement */
+        .scroll-btn {
+            display: block;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 3;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        .scroll-btn p {
+            color: white;
+            text-decoration: none;
+        }
+        .scroll-btn .mouse {
+            position: relative;
+            display: block;
+            width: 35px;
+            height: 55px;
+            margin: 0 auto 20px;
+            box-sizing: border-box;
+            border: 3px solid white;
+            border-radius: 23px;
+        }
+        .scroll-btn .mouse > * {
+            position: absolute;
+            display: block;
+            top: 29%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            margin: -4px 0 0 -4px;
+            background: white;
+            border-radius: 50%;
+            animation: ani-mouse 2.5s linear infinite;
+        }
+
+        @media only screen and (max-width: 768px) {
+            /* Blob animé sous l'icône */
+            .une-forme {
+                width: 75px; /* Largeur du blob */
+                height: 75px; /* Hauteur du blob */
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: -1;
+            }
+
+            .une-forme::before {
+                left: calc(50% - 40px); /* Ajustement pour centrer le blob */
+                top: calc(50% - 40px);  /* Ajustement pour centrer le blob */
+                width: 75px; /* Largeur du blob */
+                height: 75px; /* Hauteur du blob */
+            }
+            #svg1 { top: 8%; left: 50%; transform: translate(-50%, 0); } /* En haut, centré horizontalement */
+            #svg2 { top: 50%; right: 8%; transform: translate(0, -50%); } /* À droite, centré verticalement */
+            #svg3 { bottom: 8%; left: 50%; transform: translate(-50%, 0); } /* En bas, centré horizontalement */
+            #svg4 { top: 50%; left: 8%; transform: translate(0, -50%); } /* À gauche, centré verticalement */
+
+            #text {
+                color: white;
+                font-size: 0.9vh; /* Utilisation de vw pour une taille de texte responsive */
+                font-weight: 700;
+                text-transform: uppercase;
+            } 
+        }
+    </style>
+</head>
+<body>
+    <div id="globeViz"></div>
+    
+    <!-- Ajout des SVG cliquables avec une animation blob et texte tournant au survol -->
+    <a href="page2.html" class="image-svg-container" id="svg1">
+        <svg class="image-svg" viewBox="0 0 24 24">
+            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+        </svg>
+        <div class="une-forme">
+            <div class="rotating-text">
+                <p id="text">Lorem &#8226; Ipsum &#8226; Dolor &#8226; Sit &#8226; Amet &#8226;</p>
+            </div>
+        </div>
+    </a>
+    <a href="page1.html" class="image-svg-container" id="svg2">
+        <svg class="image-svg" viewBox="0 0 24 24">
+            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+        </svg>
+        <div class="une-forme">
+            <div class="rotating-text">
+                <p id="text">Lorem &#8226; Ipsum &#8226; Dolor &#8226; Sit &#8226; Amet &#8226;</p>
+            </div>
+        </div>
+    </a>
+    <a href="page3.html" class="image-svg-container" id="svg3">
+        <svg class="image-svg" viewBox="0 0 24 24">
+            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+        </svg>
+        <div class="une-forme">
+            <div class="rotating-text">
+                <p id="text">Lorem &#8226; Ipsum &#8226; Dolor &#8226; Sit &#8226; Amet &#8226;</p>
+            </div>
+        </div>
+    </a>
+    <a href="page4.html" class="image-svg-container" id="svg4">
+        <svg class="image-svg" viewBox="0 0 24 24">
+            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+        </svg>
+        <div class="une-forme">
+            <div class="rotating-text">
+                <p id="text">Lorem &#8226; Ipsum &#8226; Dolor &#8226; Sit &#8226; Amet &#8226;</p>
+            </div>
+        </div>
+    </a>
+
+    <!-- Animation de défilement -->
+    <span class="scroll-btn" id="scrollBtn">
+        <a href="#">
+            <span class="mouse">
+                <span></span>
+            </span>
+        </a>
+        <p>scroll me</p>
+    </span>
+
+    <a href="index.html" class="image-svg-container" id="blobButton">
+        <svg class="image-svg" viewBox="0 0 24 24">
+            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+        </svg>
+        <div class="une-forme">
+            <div class="rotating-text">
+                <p id="text">Retour à l'accueil</p>
+            </div>
+        </div>
+    </a>    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/circletype@2.3.0/dist/circletype.min.js"></script>
+    <script>
+        // Initialisation de la scène, de la caméra et du renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('globeViz').appendChild(renderer.domElement);
+
+        // Fonction pour mettre à jour la taille du globe
+        function updateGlobeSize() {
+            const scaleFactor = Math.min(window.innerWidth, window.innerHeight) / 1000;
+            const scaledGlobeRadius = 8 * scaleFactor; // 8 est la taille de base du globe
+            globe.geometry = new THREE.SphereGeometry(scaledGlobeRadius, 50, 50);
+            camera.position.z = scaledGlobeRadius * 5; // Ajustement de la position de la caméra pour un globe plus petit
+        }
+
+        // Chemin vers l'image personnalisée
+        const customTextureUrl = 'textures/NUIT.jpg'; // Remplacez par le chemin de votre image
+
+        // Création du globe avec l'image personnalisée
+        const geometry = new THREE.SphereGeometry(8, 50, 50); // 8 est la taille de base, mise à jour après
+        const texture = new THREE.TextureLoader().load(customTextureUrl);
+        const material = new THREE.MeshBasicMaterial({ map: texture });
+        const globe = new THREE.Mesh(geometry, material);
+        scene.add(globe);
+
+        // Appel initial pour ajuster la taille du globe
+        updateGlobeSize();
+
+        // Fonction de rendu
+        const animate = function () {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        };
+
+        animate();
+
+        // Rotation du globe en fonction du défilement
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.scrollY;
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+
+            console.log('Scroll Position:', scrollPosition);
+
+            // Calculer la fraction de défilement
+            const scrollFraction = scrollPosition / maxScroll;
+
+            // Convertir la fraction de défilement en un angle de rotation (de 0 à 360 degrés)
+            const rotationAngle = (scrollFraction * 2 * Math.PI) % (2 * Math.PI); // Rotation infinie
+
+            // Appliquer la rotation du globe
+            globe.rotation.y = rotationAngle;
+
+            // Afficher ou masquer les SVG en fonction de la position de défilement
+            document.getElementById('svg1').style.opacity = (scrollFraction > 0.1 && scrollFraction < 0.3) ? 1 : 0;
+            document.getElementById('svg2').style.opacity = (scrollFraction > 0.3 && scrollFraction < 0.5) ? 1 : 0;
+            document.getElementById('svg3').style.opacity = (scrollFraction > 0.5 && scrollFraction < 0.7) ? 1 : 0;
+            document.getElementById('svg4').style.opacity = (scrollFraction > 0.7 && scrollFraction < 0.9) ? 1 : 0;
+
+            // Boucler le défilement
+            if (scrollPosition >= maxScroll - 1) {
+                window.scrollTo(0, 1); // Revenir en haut de la page lorsqu'on atteint le bas
+            } else if (scrollPosition <= 0) {
+                window.scrollTo(0, maxScroll - 1); // Revenir en bas de la page lorsqu'on est en haut
+            }
+
+            if (scrollPosition > 2000) {
+                document.getElementById('scrollBtn').style.opacity = '0';
+                document.getElementById('scrollBtn').style.pointerEvents = 'none'; // Désactive les clics
+            } else {
+                document.getElementById('scrollBtn').style.opacity = '1';
+                document.getElementById('scrollBtn').style.pointerEvents = 'auto'; // Réactive les clics
+            }
+        });
+
+        // Mise à jour de la taille du renderer, du globe et de la caméra lors du redimensionnement de la fenêtre
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            updateGlobeSize(); // Recalculer la taille du globe
+        });
+
+        // Ajout du texte tournant
+        const textElements = document.querySelectorAll('#text');
+        textElements.forEach((textElement) => {
+            const rotate = new CircleType(textElement);
+
+            function updateTextSize() {
+                const formWidth = textElement.closest('.une-forme').clientWidth;
+                const maxRadius = 90; // Définir un rayon maximum en pixels pour limiter la taille
+                const newRadius = Math.min(formWidth * 0.4, maxRadius); // Limitez le rayon au maximum défini
+                rotate.radius(newRadius);
+                textElement.style.fontSize = `${formWidth * 0.1}px`; // Ajuste la taille de la police proportionnellement
+            }
+
+
+            updateTextSize(); // Initial call to set sizes
+
+            window.addEventListener('resize', updateTextSize); // Update on window resize
+
+            function rotateText() {
+                let degree = 0;
+                setInterval(() => {
+                    degree += 1;
+                    textElement.style.transform = 'rotate(' + degree + 'deg)';
+                }, 10);
+            }
+
+            rotateText(); // Initialiser l'animation de rotation
+        });
+    </script>
+</body>
+</html>

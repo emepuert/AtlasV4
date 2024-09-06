@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="//unpkg.com/globe.gl"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh; /* Hauteur de la page complète */
+            width: 100vw; /* Largeur de la page complète */
+            background-color: black;
+            font-family: Arial, sans-serif;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            overflow: hidden;
+        }
+
+        .skill-section {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: transparent; /* Pour mieux visualiser les sections */
+            transition: background-color 0.3s ease;
+        }
+
+        .globe-container {
+            position: relative;
+            width: 80%; /* Taille par défaut */
+            height: 80%; /* Taille par défaut */
+            background-color: transparent; /* Fond noir pour la div contenant le globe */
+            transition: opacity 0.5s ease; /* Transition pour le globe */
+        }
+
+        .rotating-text {
+            position: absolute;
+            width: 140%; /* Ajuster la taille du texte tournant autour du globe */
+            height: 140%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none; /* Empêche le texte de capturer les clics */
+            z-index: 1; /* Met le texte tournant en dessous de skill-content */
+        }
+
+        .rotating-text svg {
+            width: 100%;
+            height: 100%;
+            animation: rotateText 5s linear infinite; /* Animation continue du texte */
+        }
+
+        /* Animation de rotation pour le texte */
+        @keyframes rotateText {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .skill-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            font-size: 1.5em;
+            opacity: 0;
+            transition: opacity 0.5s ease; /* Transition pour le texte */
+            z-index: 2; /* Met skill-content au-dessus du texte tournant */
+        }
+
+        .barcontour {
+            border: solid white 1px;
+            padding: 5%;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.1); /* Fallback for older browsers */
+            backdrop-filter: blur(20px);
+            will-change: backdrop-filter;
+        }
+
+        .skill-section:hover .globe-container {
+            opacity: 0; /* Faire disparaître le globe lors du survol */
+        }
+
+        .skill-section:hover .skill-content {
+            opacity: 1; /* Faire apparaître le texte lors du survol */
+        }
+
+        .skill-section:hover .rotating-text {
+            opacity: 0; /* Masque le texte tournant lorsqu'on survole la section */
+            transition: opacity 0.5s ease; /* Ajoute une transition pour un effet fluide */
+        }
+
+        /* Style du bouton blob */
+        .blob-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        #menu {
+            color: white;
+            transition: color 0.3s ease; /* Ajoute une transition pour un effet plus fluide */
+        }
+
+        .blob-button .une-forme {
+            width: 150px;
+            height: 150px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        .blob-button .une-forme::before {
+            display: block;
+            position: absolute;
+            content: "";
+            left: calc(50% - 75px);
+            top: calc(50% - 75px);
+            width: 150px;
+            height: 150px;
+            border: solid 2px white;
+            border-radius: 66% 33% 66% 33% / 33% 33% 66% 66%;
+            animation: border_animation 6s linear infinite;
+            -webkit-animation: border_animation 6s linear infinite;
+            background-color: transparent;
+            transition: background-color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        @keyframes border_animation {
+            0%, 100% {
+                border-radius: 44% 56% 66% 66% / 45% 45% 55% 55%;
+                transform: translate3d(0, 0, 0) rotateZ(0.01deg);
+            }
+            33% {
+                border-radius: 66% 33% 44% 55% / 33% 22% 77% 66%;
+                transform: translate3d(0, 5px, 0) rotateZ(0.01deg);
+            }
+            50% {
+                transform: translate3d(0, 0, 0) rotateZ(0.01deg);
+            }
+            66% {
+                border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+                transform: translate3d(0, -3px, 0) rotateZ(0.01deg);
+            }
+        }
+
+        .blob-button:hover .une-forme::before {
+            background-color: white;
+        }
+
+        .blob-button a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            font-size: 1.2em;
+            z-index: 2;
+            position: relative;
+        }
+
+        .skill-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            font-size: 1.5em;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 2;
+            padding: 20px; /* Ajout de padding pour donner de l'espace autour des barres */
+            box-sizing: border-box; /* Pour inclure le padding dans la taille totale */
+        }
+
+        #skill-bar-wrapper {
+            width: 80%;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .skillbar-container {
+            position: relative;
+            margin-bottom: 15px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .skills {
+            height: 100%;
+            width: 0; /* Défaut à 0 pour permettre l'animation */
+            background-color: white; /* Assurez-vous que la couleur de remplissage est bien en blanc */
+            transition: width 2s ease;
+        }
+
+        .skill-label {
+            text-align: left;
+            margin-bottom: 5px;
+            font-size: small;
+        }
+
+        /* Conteneur pour le globe tournant en haut */
+        .rotating-globe {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 20px; /* Centré et avec un espace en dessous */
+        }
+
+        /* Texte au-dessus des barres */
+        .text-above-bars {
+            font-size: small;
+            margin-bottom: 15px;
+        }
+
+        /* Texte en dessous des barres */
+        .text-below-bars {
+            font-size: small;
+            margin-top: 10px;
+        }
+
+        /* Conteneur pour les icônes */
+        .icons-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        /* Style pour les icônes */
+        .icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+        .scroll-btn {
+            display: none; /* Masqué par défaut */
+        }
+        /* Pour les écrans de taille normale (tablettes et ordinateurs) */
+        @media only screen and (min-width: 769px) {
+            body {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr 1fr;
+                height: 100vh; /* Ajuste la hauteur du body sur grand écran */
+                overflow: hidden;
+            }
+
+            .skill-content {
+                opacity: 0; /* Masque le contenu sur les grands écrans */
+            }
+
+            .skill-section:hover .skill-content {
+                opacity: 1; /* Affiche le contenu au survol */
+            }
+
+            .skill-section:hover .globe-container,
+            .skill-section:hover .rotating-text {
+                opacity: 0; /* Masque le globe et le texte rotatif au survol */
+            }
+        }
+
+        /* Pour les écrans de taille petite (smartphones) */
+        @media only screen and (max-width: 768px) {
+            body, html {
+                height: 200vh; /* Permet au body de s'ajuster en hauteur */
+                display: block;
+                overflow-y: auto; /* Active le défilement vertical */
+            }
+
+            .skill-section {
+                height: 50vh; /* Chaque section prend toute la hauteur de l'écran */
+                width: 100%; /* Prend toute la largeur */
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #development {
+                margin-top: 20vh;
+            }
+
+            .skill-content {
+                opacity: 1; /* Affiche le contenu directement */
+                position: relative;
+                width: 100%; /* Occupe toute la largeur */
+                height: 100%; /* Occupe toute la hauteur */
+                padding: 20px; /* Ajoute un espace autour du contenu */
+                box-sizing: border-box;
+            }
+
+            .globe-container,
+            .rotating-text {
+                display: none; /* Cache le globe et le texte rotatif */
+            }
+
+            .blob-button {
+                top: 20px; /* Ajuster la distance depuis le haut */
+                right: 20px; /* Ajuster la distance depuis la droite */
+                left: auto; /* Enlève le centrage horizontal */
+                transform: none; /* Enlève le centrage par transformation */
+            }
+
+            .blob-button {
+                width: 50px;
+                height: 50px;
+            }
+
+            .blob-button .une-forme {
+                width: 50px;
+                height: 50px;
+            }
+
+            .blob-button .une-forme::before {
+                width: 50px;
+                height: 50px;
+                left: calc(50% - 25px);
+                top: calc(50% - 25px);
+            }
+
+            .blob-button a {
+                font-size: 0.5em;
+            }
+
+            /* Remplit les barres de progression dès le début sur mobile */
+            .skills {
+                width: 100% !important;
+            }
+            .scroll-btn {
+                display: block;
+                position: fixed;
+                top: 5%;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+                z-index: 3;
+                opacity: 1;
+                transition: opacity 0.1s ease;
+            }
+            .scroll-btn p {
+                color: white;
+                text-decoration: none;
+            }
+            .scroll-btn .mouse {
+                position: relative;
+                display: block;
+                width: 25px;
+                height: 45px;
+                margin: 0 auto 20px;
+                box-sizing: border-box;
+                border: 2px solid white;
+                border-radius: 23px;
+            }
+            .scroll-btn .mouse > * {
+                position: absolute;
+                display: block;
+                top: 29%;
+                left: 50%;
+                width: 8px;
+                height: 8px;
+                margin: -4px 0 0 -4px;
+                background: white;
+                border-radius: 50%;
+                animation: ani-mouse 2.5s linear infinite;
+            }
+
+            @keyframes ani-mouse {
+                0% {
+                    opacity: 1;
+                    top: 29%;
+                }
+                15% {
+                    opacity: 1;
+                    top: 50%;
+                }
+                50% {
+                    opacity: 0;
+                    top: 50%;
+                }
+                100% {
+                    opacity: 0;
+                    top: 29%;
+                }
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <span class="scroll-btn" id="scrollBtn">
+        <a href="#">
+            <span class="mouse">
+                <span></span>
+            </span>
+        </a>
+        <p>scroll me</p>
+    </span>
+    <!-- Development Section -->
+    <div id="development" class="skill-section">
+        <div class="globe-container" id="globe1"></div>
+        <div class="rotating-text">
+            <svg viewBox="0 0 300 300">
+                <defs>
+                    <path id="circlePath1" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 "/>
+                </defs>
+                <text fill="white" font-family="'Helvetica Neue', Arial" font-size="20" font-weight="bold">
+                    <textPath xlink:href="#circlePath1">I.T SKILLS</textPath>
+                </text>
+            </svg>
+        </div>
+        <div class="skill-content">
+            <div id="skill-bar-wrapper">
+                <div class="rotating-globe" id="small-globe1"></div>
+                <div class="barcontour">
+                    <div class="text-above-bars">I.T Knowledges :</div>
+                    <div class="text-left">
+                        <!-- HTML -->
+                        <div class="skill-label">Python <span style="float:right;">85%</span></div>
+                        <div class="skillbar-container clearfix" data-percent="85%">
+                            <div class="skills"></div>
+                        </div>
+    
+                        <!-- CSS -->
+                        <div class="skill-label">HTML5 - CSS<span style="float:right;">90%</span></div>
+                        <div class="skillbar-container clearfix" data-percent="90%">
+                            <div class="skills"></div>
+                        </div>
+    
+                        <!-- JavaScript -->
+                        <div class="skill-label">JavaScript <span style="float:right;">40%</span></div>
+                        <div class="skillbar-container clearfix" data-percent="40%">
+                            <div class="skills"></div>
+                        </div>
+    
+                        <!-- Python -->
+                        <div class="skill-label">SQL (Postgres) <span style="float:right;">60%</span></div>
+                        <div class="skillbar-container clearfix" data-percent="60%">
+                            <div class="skills"></div>
+                        </div>
+    
+                        <!-- React -->
+                        <div class="skill-label">Adobe Suite <span style="float:right;">75%</span></div>
+                        <div class="skillbar-container clearfix" data-percent="75%">
+                            <div class="skills"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-below-bars">Used Tech's :</div>
+                <div class="icons-row">
+                    <img src="skills-icons/python.svg" alt="Icon 1" class="icon">
+                    <img src="skills-icons/html.svg" alt="Icon 2" class="icon">
+                    <img src="skills-icons/js.svg" alt="Icon 3" class="icon">
+                    <img src="skills-icons/sql.svg" alt="Icon 4" class="icon">
+                    <img src="skills-icons/git.svg" alt="Icon 5" class="icon">
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <!-- Design Section -->
+    <div id="design" class="skill-section">
+        <div class="globe-container" id="globe2"></div>
+        <div class="rotating-text">
+            <svg viewBox="0 0 300 300">
+                <defs>
+                    <path id="circlePath2" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 "/>
+                </defs>
+                <text fill="white" font-family="'Helvetica Neue', Arial" font-size="20" font-weight="bold">
+                    <textPath xlink:href="#circlePath2">URBAN PLANNING</textPath>
+                </text>
+            </svg>
+        </div>
+        <div class="skill-content">
+            <div id="skill-bar-wrapper">
+                <div class="rotating-globe" id="small-globe2"></div>
+                <div class="text-above-bars">Urban Planning Knowledges :</div>
+                <div class="text-left">
+                    <div class="skill-label">Urban Planning<span style="float:right;">90%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="90%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">Risk Management<span style="float:right;">90%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="90%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">Mobility Management<span style="float:right;">75%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="75%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">Urban Planning Documentation Writing<span style="float:right;">90%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="90%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">Sustainable Development<span style="float:right;">60%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="60%">
+                        <div class="skills"></div>
+                    </div>
+                    <div class="text-below-bars">Used Tech's :</div>
+                    <div class="icons-row">
+                        <img src="skills-icons/france.svg" alt="Icon 1" class="icon">
+                        <img src="skills-icons/word.svg" alt="Icon 2" class="icon">
+                        <img src="skills-icons/insee.svg" alt="Icon 3" class="icon">
+                        <img src="skills-icons/osm.svg" alt="Icon 4" class="icon">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Urbanisme Section -->
+    <div id="urbanisme" class="skill-section">
+        <div class="globe-container" id="globe3"></div>
+        <div class="rotating-text">
+            <svg viewBox="0 0 300 300">
+                <defs>
+                    <path id="circlePath3" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 "/>
+                </defs>
+                <text fill="white" font-family="'Helvetica Neue', Arial" font-size="20" font-weight="bold">
+                    <textPath xlink:href="#circlePath3">GIS</textPath>
+                </text>
+            </svg>
+        </div>
+        <div class="skill-content">
+            <div id="skill-bar-wrapper">
+                <div class="rotating-globe" id="small-globe3"></div>
+                <div class="text-above-bars">GIS Knowledges :</div>
+                <div class="text-left">
+                    <div class="skill-label">QGIS<span style="float:right;">90%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="90%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">ArcGIS (all applications) <span style="float:right;">85%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="85%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">Photogrammetry <span style="float:right;">80%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="80%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">LiDAR <span style="float:right;">75%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="75%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">BIM (Building Information Modeling) <span style="float:right;">70%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="70%">
+                        <div class="skills"></div>
+                    </div>
+                </div>
+                <div class="text-below-bars">Logiciels utilisés :</div>
+                <div class="icons-row">
+                    <img src="skills-icons/qgis.svg" alt="Icon 1" class="icon">
+                    <img src="skills-icons/esri.svg" alt="Icon 2" class="icon">
+                    <img src="skills-icons/nasa.svg" alt="Icon 3" class="icon">
+                    <img src="skills-icons/lidar.svg" alt="Icon 4" class="icon">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cartographie Section -->
+    <div id="carto" class="skill-section">
+        <div class="globe-container" id="globe4"></div>
+        <div class="rotating-text">
+            <svg viewBox="0 0 300 300">
+                <defs>
+                    <path id="circlePath4" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 "/>
+                </defs>
+                <text fill="white" font-family="'Helvetica Neue', Arial" font-size="20" font-weight="bold">
+                    <textPath xlink:href="#circlePath4">DATA ANALYSE</textPath>
+                </text>
+            </svg>
+        </div>
+        <div class="skill-content">
+            <div id="skill-bar-wrapper">
+                <div class="rotating-globe" id="small-globe4"></div>
+                <div class="text-above-bars">Data Analyse Knowledges</div>
+                <div class="text-left">
+                    <div class="skill-label">Infographics <span style="float:right;">90%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="90%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">Database Management (SQL)<span style="float:right;">85%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="85%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">Scraping<span style="float:right;">80%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="80%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">Cartography<span style="float:right;">75%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="75%">
+                        <div class="skills"></div>
+                    </div>
+
+                    <div class="skill-label">Data Collection<span style="float:right;">70%</span></div>
+                    <div class="skillbar-container clearfix" data-percent="70%">
+                        <div class="skills"></div>
+                    </div>
+                </div>
+                <div class="text-below-bars">Logiciels utilisés :</div>
+                <div class="icons-row">
+                    <img src="skills-icons/adobe.svg" alt="Icon 1" class="icon">
+                    <img src="skills-icons/rstudio.svg" alt="Icon 2" class="icon">
+                    <img src="skills-icons/figma.svg" alt="Icon 3" class="icon">
+                    <img src="skills-icons/blender.svg" alt="Icon 4" class="icon">
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <!-- Bouton Blob pour revenir à l'index -->
+    <div class="blob-button" id="blobButton">
+        <div class="une-forme"></div>
+        <a id="menu" href="index.html">Retour</a>
+    </div>
+    <script src="//unpkg.com/globe.gl" defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>    
+    <script type="module">
+        let lastUpdateTime = 0;
+        function updateTexture() {
+            const currentTime = performance.now();
+            if (currentTime - lastUpdateTime > 1000) {
+                // Code pour texSubImage2D ici
+                lastUpdateTime = currentTime;
+            }
+            requestAnimationFrame(updateTexture);
+        }
+
+        // Rotation du globe en fonction du défilement
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.scrollY;
+            console.log('Scroll Position:', scrollPosition);
+            if (scrollPosition > 50) {
+                document.getElementById('scrollBtn').style.opacity = '0';
+            } else {
+                document.getElementById('scrollBtn').style.opacity = '1';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const blobButton = document.getElementById('blobButton');
+            const menuText = document.getElementById('menu');
+
+            blobButton.addEventListener('mouseover', function() {
+                menuText.style.color = 'black';
+            });
+
+            blobButton.addEventListener('mouseout', function() {
+                menuText.style.color = 'white';
+            });
+        });
+
+        import * as THREE from '//unpkg.com/three/build/three.module.js';
+
+        function createGlobe(containerId, textureUrl, rotationSpeed, globeSize) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Efface tout contenu précédent
+            container.style.width = globeSize.width;
+            container.style.height = globeSize.height;
+
+            const globe = Globe()(container)
+                .globeImageUrl(textureUrl)
+                .width(container.offsetWidth)
+                .height(container.offsetHeight)
+                .backgroundColor('rgba(0, 0, 0, 0)')
+                .bumpImageUrl('textures/BUMP.jpg')
+
+            globe.controls().autoRotate = true;
+            globe.controls().autoRotateSpeed = rotationSpeed;
+            globe.controls().enableZoom = false;
+            globe.controls().enableRotate = false;
+
+        }
+
+        function createGlobeWithClouds(containerId, textureUrl, rotationSpeed, globeSize) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Efface tout contenu précédent
+            container.style.width = globeSize.width;
+            container.style.height = globeSize.height;
+
+            const world = Globe()(container)
+                .globeImageUrl(textureUrl)
+                .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png') // Bump texture pour les reliefs
+                .width(container.offsetWidth)
+                .height(container.offsetHeight)
+                .backgroundColor('rgba(0, 0, 0, 0)');
+
+            // Auto-rotate
+            world.controls().autoRotate = true;
+            world.controls().autoRotateSpeed = rotationSpeed;
+
+            // Add clouds sphere
+            const CLOUDS_IMG_URL = 'textures/CLOUDS.png'; // URL de l'image des nuages
+            const CLOUDS_ALT = 0.004;
+            const CLOUDS_ROTATION_SPEED = -0.006; // deg/frame
+
+            new THREE.TextureLoader().load(CLOUDS_IMG_URL, cloudsTexture => {
+                const clouds = new THREE.Mesh(
+                    new THREE.SphereGeometry(world.getGlobeRadius() * (1 + CLOUDS_ALT), 75, 75),
+                    new THREE.MeshPhongMaterial({ map: cloudsTexture, transparent: true })
+                );
+                world.scene().add(clouds);
+
+                (function rotateClouds() {
+                    clouds.rotation.y += CLOUDS_ROTATION_SPEED * Math.PI / 180;
+                    requestAnimationFrame(rotateClouds);
+                })();
+            });
+        }
+
+        // Créer les globes avec des textures, vitesses de rotation, et tailles spécifiques
+        createGlobe('globe1', 'textures/WEBP/IT.webp', 1, { width: '90%', height: '90%' });
+        createGlobe('globe2', 'textures/WEBP/MAPMOND.webp', 1, { width: '90%', height: '90%' });
+        createGlobeWithClouds('globe3', 'textures/WEBP/EARTH.webp', 1, { width: '90%', height: '90%' });
+        createGlobe('globe4', 'textures/WEBP/DATA.webp', 1, { width: '90%', height: '90%' });
+
+        window.addEventListener('resize', () => {
+            createGlobe('globe1', 'textures/WEBP/IT.webp', 1, { width: '90%', height: '90%' });
+            createGlobe('globe2', 'textures/WEBP/MAPMOND.webp', 1, { width: '90%', height: '90%' });
+            createGlobeWithClouds('globe3', 'textures/WEBP/EARTH.webp', 1, { width: '90%', height: '90%' });
+            createGlobe('globe4', 'textures/WEBP/DATA.webp', 1, { width: '90%', height: '90%' });
+        });
+
+        $(document).ready(function() {
+
+            function animateBars($section) {
+                $section.find('.skillbar-container .skills').each(function() {
+                    $(this).css({ width: $(this).parent().attr('data-percent') }); // Remplit les barres
+                });
+            }
+
+            function resetBars($section) {
+                $section.find('.skillbar-container .skills').each(function() {
+                    $(this).css({ width: '0' }); // Réinitialise les barres
+                });
+            }
+
+            // Vérifie si on est sur un écran mobile
+            if (window.innerWidth <= 768) {
+                // Remplit directement les barres sur mobile
+                $('.skillbar-container').each(function() {
+                    var $skillBar = $(this).find('.skills');
+                    $skillBar.css({ width: $(this).attr('data-percent') });
+                });
+            } else {
+                // Animation des barres de progression au survol pour les écrans plus grands
+                $('.skill-section').on('mouseenter', function() {
+                    animateBars($(this));
+                });
+
+                $('.skill-section').on('mouseleave', function() {
+                    resetBars($(this));
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>

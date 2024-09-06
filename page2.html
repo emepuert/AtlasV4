@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Page 3</title>
+    <script src="https://unpkg.com/three@0.133.1/build/three.min.js"></script>
+    <script src="https://unpkg.com/globe.gl"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(#000000 0%, #1a1a4e 25%, #1b6fa6 50%, #2cb5e8 75%, #8fd3f4 100%);
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Conteneur principal */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        /* Div1 */
+        .div1 {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 220px; /* Hauteur de div1 */
+        }
+
+        /* Div2 */
+        .div2 {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100%; /* Hauteur de div2 */
+            padding-left: 10%;
+            padding-right: 10%;
+        }
+
+        .globe-container {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            z-index: 1;
+        }
+
+        .rotating-text {
+            position: absolute;
+            width: 210px;
+            height: 210px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .rotating-text svg {
+            width: 100%;
+            height: 100%;
+            animation: rotateText 10s linear infinite;
+        }
+
+        /* Animation de rotation pour le texte */
+        @keyframes rotateText {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .content {
+            max-width: 600px;
+            font-size: 2vh;
+            padding: 20px;
+            border: solid 1px rgb(255, 255, 255);
+            color: white;
+        }
+
+        .blob-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        #menu {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .blob-button .une-forme {
+            width: 80px;
+            height: 80px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        .blob-button .une-forme::before {
+            display: block;
+            position: absolute;
+            content: "";
+            left: calc(50% - 40px);
+            top: calc(50% - 40px);
+            width: 80px;
+            height: 80px;
+            border: solid 2px white;
+            border-radius: 66% 33% 66% 33% / 33% 33% 66% 66%;
+            animation: border_animation 6s linear infinite;
+            background-color: transparent;
+            transition: background-color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        @keyframes border_animation {
+            0%, 100% {
+                border-radius: 44% 56% 66% 66% / 45% 45% 55% 55%;
+                transform: translate3d(0, 0, 0) rotateZ(0.01deg);
+            }
+            33% {
+                border-radius: 66% 33% 44% 55% / 33% 22% 77% 66%;
+                transform: translate3d(0, 5px, 0) rotateZ(0.01deg);
+            }
+            50% {
+                transform: translate3d(0, 0, 0) rotateZ(0.01deg);
+            }
+            66% {
+                border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+                transform: translate3d(0, -3px, 0) rotateZ(0.01deg);
+            }
+        }
+
+        .blob-button:hover .une-forme::before {
+            background-color: white;
+        }
+
+        .blob-button a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            font-size: 1em;
+            z-index: 2;
+            position: relative;
+        }
+        .blob-button a:hover {
+            color: black;
+        }
+        .clouds {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 20;
+        }
+
+        .clouds img {
+            position: absolute;
+            bottom: 0; /* Aligne les nuages en bas */
+            max-width: 100%;
+            animation: animate calc(20s * var(--i)) ease-in-out infinite;
+            animation-delay: calc(-5s * var(--i));
+        }
+
+
+        @keyframes animate {
+            0% {
+                transform: translateX(110%);
+            }
+            100% {
+                transform: translateX(-150%);
+            }
+        }
+
+        @media only screen and (max-width: 768px) {
+            .blob-button {
+                top: 2%;
+                right: 7%; /* Ajuste cette valeur pour décaler davantage vers la droite */
+            }
+        }
+
+        .globe-geant-section {
+            position: relative;
+            height: 40vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            overflow: hidden;
+            padding-bottom: 0;
+        }
+
+        .globe-container-geant {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        /* Pour les écrans de taille petite (smartphones) */
+        @media only screen and (max-width: 768px) {
+            .div1 {
+                height: 220px; /* Hauteur de div1 */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blob-button" id="blobButton">
+        <div class="une-forme"></div>
+        <a id="menu" href="index.html">Retour</a>
+    </div> 
+    <!-- Conteneur Principal qui englobe div1 et div2 -->
+    <div class="main-container">
+        <!-- Div 1 -->
+        <div class="div1">
+            <div class="globe-container" id="globe1"></div>
+            <div class="rotating-text">
+                <svg viewBox="0 0 300 300">
+                    <defs>
+                        <path id="circlePath1" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 " />
+                    </defs>
+                    <text fill="white" font-family="'Helvetica Neue', Arial" font-size="40" font-weight="bold">
+                        <textPath xlink:href="#circlePath1">Myself</textPath>
+                    </text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Div 2 -->
+        <div class="div2">
+            <div class="content">
+                <h2>Introduction</h2>
+                <p>Welcome to my portfolio! My name is Dawa Tran Quang-Tru, I'm 25 years old and currently living in Nancy, France. I am passionate about digital sciences, computer science, and graphic design. My mind is always eager to solve real-world problems, and I love to innovate and develop new things. I am a native French speaker, but I also speak English fluently (level 895). Outside of my professional life, I enjoy traveling, exploring different cuisines, and swimming—water is truly my second element. Through this portfolio, you'll learn more about my journey, professional experiences, education, and the things that inspire me..</p>
+            </div>
+        </div>
+    </div>
+    <div class="main-container">
+        <!-- Div 1 -->
+        <div class="div1">
+            <div class="globe-container" id="globe2"></div>
+            <div class="rotating-text">
+                <svg viewBox="0 0 300 300">
+                    <defs>
+                        <path id="circlePath1" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 " />
+                    </defs>
+                    <text fill="white" font-family="'Helvetica Neue', Arial" font-size="40" font-weight="bold">
+                        <textPath xlink:href="#circlePath1">Myself</textPath>
+                    </text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Div 2 -->
+        <div class="div2">
+            <div class="content">
+                <h2>Introduction</h2>
+                <p>Welcome to my portfolio! My name is Dawa Tran Quang-Tru, I'm 25 years old and currently living in Nancy, France. I am passionate about digital sciences, computer science, and graphic design. My mind is always eager to solve real-world problems, and I love to innovate and develop new things. I am a native French speaker, but I also speak English fluently (level 895). Outside of my professional life, I enjoy traveling, exploring different cuisines, and swimming—water is truly my second element. Through this portfolio, you'll learn more about my journey, professional experiences, education, and the things that inspire me..</p>
+            </div>
+        </div>
+    </div>
+    <div class="main-container">
+        <!-- Div 1 -->
+        <div class="div1">
+            <div class="globe-container" id="globe3"></div>
+            <div class="rotating-text">
+                <svg viewBox="0 0 300 300">
+                    <defs>
+                        <path id="circlePath1" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 " />
+                    </defs>
+                    <text fill="white" font-family="'Helvetica Neue', Arial" font-size="40" font-weight="bold">
+                        <textPath xlink:href="#circlePath1">Myself</textPath>
+                    </text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Div 2 -->
+        <div class="div2">
+            <div class="content">
+                <h2>Introduction</h2>
+                <p>Welcome to my portfolio! My name is Dawa Tran Quang-Tru, I'm 25 years old and currently living in Nancy, France. I am passionate about digital sciences, computer science, and graphic design. My mind is always eager to solve real-world problems, and I love to innovate and develop new things. I am a native French speaker, but I also speak English fluently (level 895). Outside of my professional life, I enjoy traveling, exploring different cuisines, and swimming—water is truly my second element. Through this portfolio, you'll learn more about my journey, professional experiences, education, and the things that inspire me..</p>
+            </div>
+        </div>
+    </div>
+    <div class="main-container">
+        <!-- Div 1 -->
+        <div class="div1">
+            <div class="globe-container" id="globe4"></div>
+            <div class="rotating-text">
+                <svg viewBox="0 0 300 300">
+                    <defs>
+                        <path id="circlePath1" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 " />
+                    </defs>
+                    <text fill="white" font-family="'Helvetica Neue', Arial" font-size="40" font-weight="bold">
+                        <textPath xlink:href="#circlePath1">Myself</textPath>
+                    </text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Div 2 -->
+        <div class="div2">
+            <div class="content">
+                <h2>Introduction</h2>
+                <p>Welcome to my portfolio! My name is Dawa Tran Quang-Tru, I'm 25 years old and currently living in Nancy, France. I am passionate about digital sciences, computer science, and graphic design. My mind is always eager to solve real-world problems, and I love to innovate and develop new things. I am a native French speaker, but I also speak English fluently (level 895). Outside of my professional life, I enjoy traveling, exploring different cuisines, and swimming—water is truly my second element. Through this portfolio, you'll learn more about my journey, professional experiences, education, and the things that inspire me..</p>
+            </div>
+        </div>
+    </div>
+    <div class="section globe-geant-section">
+        <div class="clouds">
+            <img src="clouds/cloud2.png" style="--i:1">
+            <img src="clouds/cloud2.png" style="--i:2">
+            <img src="clouds/cloud2.png" style="--i:3">
+            <img src="clouds/cloud2.png" style="--i:4">
+            <img src="clouds/cloud2.png" style="--i:5">
+        </div>          
+        <div class="globe-container-geant" id="globeGeant"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const blobButton = document.getElementById('blobButton');
+            const menuText = document.getElementById('menu');
+    
+            blobButton.addEventListener('mouseover', function() {
+                menuText.style.color = 'black';
+            });
+    
+            blobButton.addEventListener('mouseout', function() {
+                menuText.style.color = 'white';
+            });
+        });
+    </script>
+    <script type="module">
+        import * as THREE from '//unpkg.com/three/build/three.module.js';
+    
+        // Fonction pour créer un globe
+        function createGlobe(containerId, textureUrl, bumpUrl, rotationSpeed = 0.5) {
+            const container = document.getElementById(containerId);
+            const width = container.offsetWidth;
+            const height = container.offsetHeight;
+    
+            const world = Globe()
+                .globeImageUrl(textureUrl)
+                .bumpImageUrl(bumpUrl)
+                .backgroundColor('rgba(0, 0, 0, 0)') // Fond transparent
+                (container);
+    
+            // Limiter la taille du globe
+            world.width(width).height(height);
+    
+            // Matériau personnalisé
+            const globeMaterial = world.globeMaterial();
+            globeMaterial.bumpScale = 100;
+    
+            const directionalLight = world.lights().find(light => light.type === 'DirectionalLight');
+            directionalLight && directionalLight.position.set(1, 1, 1); // Ajuste la lumière
+    
+            // Activer la rotation automatique
+            world.controls().autoRotate = true;
+            world.controls().autoRotateSpeed = rotationSpeed;
+    
+            return world;
+        }
+    
+        // Initialiser les globes normaux avec rotation automatique
+        $(document).ready(function () {
+            createGlobe('globe1', 'textures/MOON.jpg', 'textures/BUMP.jpg', 1.0); // Globe 1 avec rotation rapide
+            createGlobe('globe2', '//unpkg.com/three-globe/example/img/earth-night.jpg', 'textures/BUMP.jpg', 0.5); // Globe 2 avec rotation moyenne
+            createGlobe('globe3', 'textures/MOON.jpg', 'textures/BUMP.jpg', 1.0); // Globe 3 avec rotation rapide
+            createGlobe('globe4', '//unpkg.com/three-globe/example/img/earth-night.jpg', 'textures/BUMP.jpg', 0.5); // Globe 4 avec rotation moyenne
+        });
+    </script>    
+    <script type="module">
+        import * as THREE from '//unpkg.com/three/build/three.module.js';
+    
+        $(document).ready(function () {
+            const globeGeant = Globe()
+                .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+                .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+                .backgroundColor('rgba(0, 0, 0, 0)') // Fond transparent
+                (document.getElementById('globeGeant'));
+    
+            // custom globe material
+            const globeMaterial = globeGeant.globeMaterial();
+            globeMaterial.bumpScale = 100;
+    
+            const directionalLight = globeGeant.lights().find(light => light.type === 'DirectionalLight');
+            directionalLight && directionalLight.position.set(1, 1, 1);
+    
+            // Appliquer l'échelle pour grossir le globe tout en le centrant
+            document.getElementById('globeGeant').style.transform = 'scale(1.5) translate(-32%, -15%)';
+    
+            globeGeant.controls().autoRotate = true;
+            globeGeant.controls().autoRotateSpeed = 0.5;
+    
+            // Rendre le globe géant responsive
+            window.addEventListener('resize', () => {
+                globeGeant.width(window.innerWidth);
+                globeGeant.height(window.innerHeight);
+            });
+        });
+    </script>    
+</body>
+
+</html>
