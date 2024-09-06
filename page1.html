@@ -80,6 +80,8 @@
             border: solid 2px;
             margin: 2%;
             border-radius: 20px;
+            background-color: transparent;
+            backdrop-filter: blur(5px);
         }
 
         .skill-section:hover .globe-container {
@@ -182,7 +184,7 @@
 
         .skillbar-container {
             position: relative;
-            margin-bottom: 15px;
+            margin-bottom: 2%;
             width: 100%;
             background-color: rgba(255, 255, 255, 0.1);
             height: 0.5vw;
@@ -231,11 +233,53 @@
             height: 2vh;
             object-fit: contain;
         }
+
         .scroll-btn {
             display: none; /* Masqué par défaut */
         }
 
-        
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        .star-layer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: transparent;
+        }
+
+        /* Animation scintillante plus rapide */
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 1;
+            }
+            30% {
+                opacity: 0.2; /* Opacité plus faible pour un effet plus visible */
+            }
+            70% {
+                opacity: 0.7;
+            }
+        }
+
+        /* Appliquer des animations de scintillement à différentes vitesses */
+        #stars1 .star-layer {
+            animation: twinkle 1s linear infinite; /* Animation rapide */
+        }
+
+        #stars2 .star-layer {
+            animation: twinkle 1.5s linear infinite; /* Animation modérée */
+        }
+
+        #stars3 .star-layer {
+            animation: twinkle 2s linear infinite; /* Animation lente */
+        }
         /* Pour les écrans de taille normale (tablettes et ordinateurs) */
         @media only screen and (min-width: 769px) {
             body {
@@ -263,7 +307,6 @@
         /* Pour les écrans de taille petite (smartphones) */
         @media only screen and (max-width: 768px) {
             body, html {
-                height: 200vh; /* Permet au body de s'ajuster en hauteur */
                 display: block;
                 overflow-y: auto; /* Active le défilement vertical */
             }
@@ -324,11 +367,10 @@
             }
 
             /* Remplit les barres de progression dès le début sur mobile */
-            .skills {
-                width: 100% !important;
-            }
+
             .skillbar-container {
                 height: 1vw;
+                margin-bottom: 8%;
             }
             .scroll-btn {
                 display: block;
@@ -391,6 +433,9 @@
     </style>
 </head>
 <body>
+    <div class="stars" id="stars1"></div>
+    <div class="stars" id="stars2"></div>
+    <div class="stars" id="stars3"></div>
     <span class="scroll-btn" id="scrollBtn">
         <a href="#">
             <span class="mouse">
@@ -558,7 +603,7 @@
                         <div class="skills"></div>
                     </div>
                 </div>
-                <div class="text-below-bars">Logiciels utilisés :</div>
+                <div class="text-below-bars">Used Tech's :</div>
                 <div class="icons-row">
                     <img src="skills-icons/qgis.svg" alt="Icon 1" class="icon">
                     <img src="skills-icons/esri.svg" alt="Icon 2" class="icon">
@@ -612,7 +657,7 @@
                         <div class="skills"></div>
                     </div>
                 </div>
-                <div class="text-below-bars">Logiciels utilisés :</div>
+                <div class="text-below-bars">Used Tech's :</div>
                 <div class="icons-row">
                     <img src="skills-icons/adobe.svg" alt="Icon 1" class="icon">
                     <img src="skills-icons/rstudio.svg" alt="Icon 2" class="icon">
@@ -629,7 +674,39 @@
         <a id="menu" href="index.html">Retour</a>
     </div>
     <script src="//unpkg.com/globe.gl" defer></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+    <script>
+        function createStars(layerId, numStars, starSize, minTwinkleTime, maxTwinkleTime) {
+            const starsContainer = document.getElementById(layerId);
+            
+            for (let i = 0; i < numStars; i++) {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+
+                const starElement = document.createElement('div');
+                starElement.classList.add('star-layer');
+                starElement.style.width = `${starSize}px`;
+                starElement.style.height = `${starSize}px`;
+                starElement.style.backgroundColor = '#FFF';
+                starElement.style.position = 'absolute';
+                starElement.style.top = `${y}px`;
+                starElement.style.left = `${x}px`;
+
+                // Durée et délai d'animation aléatoires
+                const twinkleDuration = Math.random() * (maxTwinkleTime - minTwinkleTime) + minTwinkleTime;
+                const twinkleDelay = Math.random() * twinkleDuration;
+                starElement.style.animationDuration = `${twinkleDuration}s`;
+                starElement.style.animationDelay = `${twinkleDelay}s`;
+
+                starsContainer.appendChild(starElement);
+            }
+        }
+
+        // Créer des étoiles avec un scintillement plus rapide
+        createStars('stars1', 2000, 1, 0.5, 2); // Petite taille, scintillement rapide
+        createStars('stars2', 1500, 2, 1, 3); // Taille moyenne, scintillement modéré
+        createStars('stars3', 1000, 3, 1.5, 4); // Grande taille, scintillement plus lent
+    </script>
     <script type="module">
         let lastUpdateTime = 0;
         function updateTexture() {
