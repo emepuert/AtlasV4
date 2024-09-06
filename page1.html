@@ -66,26 +66,20 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 90%;
+            height: 90%;
             display: flex;
             justify-content: center;
             align-items: center;
             color: white;
             text-align: center;
-            font-size: 1.5em;
+            font-size: 75%;
             opacity: 0;
             transition: opacity 0.5s ease; /* Transition pour le texte */
             z-index: 2; /* Met skill-content au-dessus du texte tournant */
-        }
-
-        .barcontour {
-            border: solid white 1px;
-            padding: 5%;
+            border: solid 2px;
+            margin: 2%;
             border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.1); /* Fallback for older browsers */
-            backdrop-filter: blur(20px);
-            will-change: backdrop-filter;
         }
 
         .skill-section:hover .globe-container {
@@ -178,25 +172,6 @@
             position: relative;
         }
 
-        .skill-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-            font-size: 1.5em;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            z-index: 2;
-            padding: 20px; /* Ajout de padding pour donner de l'espace autour des barres */
-            box-sizing: border-box; /* Pour inclure le padding dans la taille totale */
-        }
-
         #skill-bar-wrapper {
             width: 80%;
             height: 80%;
@@ -210,7 +185,7 @@
             margin-bottom: 15px;
             width: 100%;
             background-color: rgba(255, 255, 255, 0.1);
-            height: 10px;
+            height: 0.5vw;
             overflow: hidden;
         }
 
@@ -224,7 +199,6 @@
         .skill-label {
             text-align: left;
             margin-bottom: 5px;
-            font-size: small;
         }
 
         /* Conteneur pour le globe tournant en haut */
@@ -236,13 +210,11 @@
 
         /* Texte au-dessus des barres */
         .text-above-bars {
-            font-size: small;
-            margin-bottom: 15px;
+            margin-bottom: 1vw;
         }
 
         /* Texte en dessous des barres */
         .text-below-bars {
-            font-size: small;
             margin-top: 10px;
         }
 
@@ -255,13 +227,15 @@
 
         /* Style pour les icônes */
         .icon {
-            width: 25px;
-            height: 25px;
+            width: 2vh;
+            height: 2vh;
             object-fit: contain;
         }
         .scroll-btn {
             display: none; /* Masqué par défaut */
         }
+
+        
         /* Pour les écrans de taille normale (tablettes et ordinateurs) */
         @media only screen and (min-width: 769px) {
             body {
@@ -295,7 +269,7 @@
             }
 
             .skill-section {
-                height: 50vh; /* Chaque section prend toute la hauteur de l'écran */
+                height: 75vh; /* Chaque section prend toute la hauteur de l'écran */
                 width: 100%; /* Prend toute la largeur */
                 display: flex;
                 flex-direction: column;
@@ -310,7 +284,7 @@
             .skill-content {
                 opacity: 1; /* Affiche le contenu directement */
                 position: relative;
-                width: 100%; /* Occupe toute la largeur */
+                width: 90%; /* Occupe toute la largeur */
                 height: 100%; /* Occupe toute la hauteur */
                 padding: 20px; /* Ajoute un espace autour du contenu */
                 box-sizing: border-box;
@@ -352,6 +326,9 @@
             /* Remplit les barres de progression dès le début sur mobile */
             .skills {
                 width: 100% !important;
+            }
+            .skillbar-container {
+                height: 1vw;
             }
             .scroll-btn {
                 display: block;
@@ -701,7 +678,6 @@
                 .width(container.offsetWidth)
                 .height(container.offsetHeight)
                 .backgroundColor('rgba(0, 0, 0, 0)')
-                .bumpImageUrl('textures/WEBP/BUMP.webp')
 
             globe.controls().autoRotate = true;
             globe.controls().autoRotateSpeed = rotationSpeed;
@@ -709,7 +685,6 @@
             globe.controls().enableRotate = false;
 
             const globeMaterial = globe.globeMaterial();
-            globeMaterial.bumpScale = 10;
 
         }
 
@@ -727,7 +702,7 @@
                 .backgroundColor('rgba(0, 0, 0, 0)');
 
             const globeMaterial = world.globeMaterial();
-            globeMaterial.bumpScale = 10;
+            globeMaterial.bumpScale = 100;
 
             // Auto-rotate
             world.controls().autoRotate = true;
@@ -766,6 +741,10 @@
         });
 
         $(document).ready(function() {
+            createGlobe('small-globe1', 'textures/WEBP/IT.webp', 1.0, { width: '16%', height: '16%' });
+            createGlobe('small-globe2', 'textures/WEBP/MAPMOND.webp', 1.0, { width: '16%', height: '16%' });
+            createGlobeWithClouds('small-globe3', 'textures/WEBP/EARTH.webp', 1, { width: '16%', height: '16%' });
+            createGlobe('small-globe4', 'textures/WEBP/DATA.webp', 1.0, { width: '16%', height: '16%' });
 
             function animateBars($section) {
                 $section.find('.skillbar-container .skills').each(function() {
