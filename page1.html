@@ -700,12 +700,15 @@
                 .width(container.offsetWidth)
                 .height(container.offsetHeight)
                 .backgroundColor('rgba(0, 0, 0, 0)')
-                .bumpImageUrl('textures/BUMP.jpg')
+                .bumpImageUrl('textures/WEBP/BUMP.webp')
 
             globe.controls().autoRotate = true;
             globe.controls().autoRotateSpeed = rotationSpeed;
             globe.controls().enableZoom = false;
             globe.controls().enableRotate = false;
+
+            const globeMaterial = globe.globeMaterial();
+            globeMaterial.bumpScale = 10;
 
         }
 
@@ -717,17 +720,20 @@
 
             const world = Globe()(container)
                 .globeImageUrl(textureUrl)
-                .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png') // Bump texture pour les reliefs
+                .bumpImageUrl('textures/WEBP/BUMP.webp') // Bump texture pour les reliefs
                 .width(container.offsetWidth)
                 .height(container.offsetHeight)
                 .backgroundColor('rgba(0, 0, 0, 0)');
+
+            const globeMaterial = world.globeMaterial();
+            globeMaterial.bumpScale = 10;
 
             // Auto-rotate
             world.controls().autoRotate = true;
             world.controls().autoRotateSpeed = rotationSpeed;
 
             // Add clouds sphere
-            const CLOUDS_IMG_URL = 'textures/CLOUDS.png'; // URL de l'image des nuages
+            const CLOUDS_IMG_URL = 'textures/WEBP/CLOUDS.webp'; // URL de l'image des nuages
             const CLOUDS_ALT = 0.004;
             const CLOUDS_ROTATION_SPEED = -0.006; // deg/frame
 
