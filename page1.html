@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="//unpkg.com/globe.gl"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body, html {
             margin: 0;
@@ -77,11 +78,12 @@
             opacity: 0;
             transition: opacity 0.5s ease; /* Transition pour le texte */
             z-index: 2; /* Met skill-content au-dessus du texte tournant */
-            border: solid 2px;
+            border: solid 1px;
             margin: 2%;
             border-radius: 20px;
-            background-color: transparent;
-            backdrop-filter: blur(5px);
+            background-color: rgba(0, 0, 0, 0); /* Fallback pour les navigateurs sans backdrop-filter */
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px); /* Ajoutez cette ligne pour iOS */
         }
 
         .skill-section:hover .globe-container {
@@ -103,8 +105,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 150px;
-            height: 150px;
+            width: 75px;
+            height: 75px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -131,15 +133,16 @@
             display: block;
             position: absolute;
             content: "";
-            left: calc(50% - 75px);
-            top: calc(50% - 75px);
-            width: 150px;
-            height: 150px;
+            left: calc(50% - 40px);
+            top: calc(50% - 40px);
+            width: 75px;
+            height: 75px;
             border: solid 2px white;
             border-radius: 66% 33% 66% 33% / 33% 33% 66% 66%;
             animation: border_animation 6s linear infinite;
             -webkit-animation: border_animation 6s linear infinite;
             background-color: transparent;
+            backdrop-filter: blur(5px);
             transition: background-color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
@@ -633,8 +636,8 @@
     <!-- Bouton Blob pour revenir à l'index -->
     <div class="blob-button" id="blobButton">
         <div class="une-forme"></div>
-        <a id="menu" href="index.html">Retour</a>
-    </div>
+        <a id="menu" href="index.html"><i class="fas fa-home"></i></a>
+    </div>    
     <script src="//unpkg.com/globe.gl" defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
     <script>
