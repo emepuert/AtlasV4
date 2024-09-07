@@ -334,6 +334,17 @@
                 display: none; /* Cache le globe et le texte rotatif */
             }
 
+            .rotating-globe {
+                width: 15vh !important; /* Ajustez cette valeur à ce qui convient le mieux pour mobile */
+                height: 15vh !important; /* Ajustez cette valeur à ce qui convient le mieux pour mobile */
+            }
+
+            .globe-container canvas {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: contain;
+            }
+
             .blob-button {
                 top: 20px; /* Ajuster la distance depuis le haut */
                 right: 20px; /* Ajuster la distance depuis la droite */
@@ -673,6 +684,16 @@
                 });
             }
         });
+        function resizeGlobeCanvas() {
+            document.querySelectorAll('.globe-container canvas').forEach(canvas => {
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+            });
+        }
+
+        window.addEventListener('resize', resizeGlobeCanvas);
+        window.addEventListener('load', resizeGlobeCanvas);
+
     </script>
     <script type="module">
         import * as THREE from '//unpkg.com/three/build/three.module.js';
