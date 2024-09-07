@@ -234,10 +234,6 @@
             object-fit: contain;
         }
 
-        .scroll-btn {
-            display: none; /* Masqué par défaut */
-        }
-
         .stars {
             position: absolute;
             width: 100%;
@@ -308,7 +304,7 @@
         @media only screen and (max-width: 768px) {
             body, html {
                 display: block;
-                overflow-y: auto; /* Active le défilement vertical */
+                overflow-y: scroll; /* Active le défilement vertical */
             }
 
             .skill-section {
@@ -372,43 +368,6 @@
                 height: 1vw;
                 margin-bottom: 8%;
             }
-            .scroll-btn {
-                display: block;
-                position: fixed;
-                top: 5%;
-                left: 50%;
-                transform: translateX(-50%);
-                text-align: center;
-                z-index: 3;
-                opacity: 1;
-                transition: opacity 0.1s ease;
-            }
-            .scroll-btn p {
-                color: white;
-                text-decoration: none;
-            }
-            .scroll-btn .mouse {
-                position: relative;
-                display: block;
-                width: 25px;
-                height: 45px;
-                margin: 0 auto 20px;
-                box-sizing: border-box;
-                border: 2px solid white;
-                border-radius: 23px;
-            }
-            .scroll-btn .mouse > * {
-                position: absolute;
-                display: block;
-                top: 29%;
-                left: 50%;
-                width: 8px;
-                height: 8px;
-                margin: -4px 0 0 -4px;
-                background: white;
-                border-radius: 50%;
-                animation: ani-mouse 2.5s linear infinite;
-            }
 
             @keyframes ani-mouse {
                 0% {
@@ -436,14 +395,6 @@
     <div class="stars" id="stars1"></div>
     <div class="stars" id="stars2"></div>
     <div class="stars" id="stars3"></div>
-    <span class="scroll-btn" id="scrollBtn">
-        <a href="#">
-            <span class="mouse">
-                <span></span>
-            </span>
-        </a>
-        <p>scroll me</p>
-    </span>
     <!-- Development Section -->
     <div id="development" class="skill-section">
         <div class="globe-container" id="globe1"></div>
@@ -703,45 +654,27 @@
         }
 
         // Créer des étoiles avec un scintillement plus rapide
-        createStars('stars1', 2000, 1, 0.5, 2); // Petite taille, scintillement rapide
-        createStars('stars2', 1500, 2, 1, 3); // Taille moyenne, scintillement modéré
-        createStars('stars3', 1000, 3, 1.5, 4); // Grande taille, scintillement plus lent
+        createStars('stars1', 100, 1, 0.5, 2); // Petite taille, scintillement rapide
+        createStars('stars2', 100, 2, 1, 3); // Taille moyenne, scintillement modéré
+        createStars('stars3', 100, 3, 1.5, 4); // Grande taille, scintillement plus lent
     </script>
-    <script type="module">
-        let lastUpdateTime = 0;
-        function updateTexture() {
-            const currentTime = performance.now();
-            if (currentTime - lastUpdateTime > 1000) {
-                // Code pour texSubImage2D ici
-                lastUpdateTime = currentTime;
-            }
-            requestAnimationFrame(updateTexture);
-        }
-
-        // Rotation du globe en fonction du défilement
-        window.addEventListener('scroll', () => {
-            const scrollPosition = window.scrollY;
-            console.log('Scroll Position:', scrollPosition);
-            if (scrollPosition > 50) {
-                document.getElementById('scrollBtn').style.opacity = '0';
-            } else {
-                document.getElementById('scrollBtn').style.opacity = '1';
-            }
-        });
-
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const blobButton = document.getElementById('blobButton');
             const menuText = document.getElementById('menu');
 
-            blobButton.addEventListener('mouseover', function() {
-                menuText.style.color = 'black';
-            });
+            if (blobButton) {
+                blobButton.addEventListener('mouseover', function() {
+                    menuText.style.color = 'black';
+                });
 
-            blobButton.addEventListener('mouseout', function() {
-                menuText.style.color = 'white';
-            });
+                blobButton.addEventListener('mouseout', function() {
+                    menuText.style.color = 'white';
+                });
+            }
         });
-
+    </script>
+    <script type="module">
         import * as THREE from '//unpkg.com/three/build/three.module.js';
 
         function createGlobe(containerId, textureUrl, rotationSpeed, globeSize) {
