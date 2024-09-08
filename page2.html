@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio - Page 3</title>
     <script src="https://unpkg.com/three@0.133.1/build/three.min.js"></script>
-    <script src="https://unpkg.com/globe.gl"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
         body {
             margin: 0;
             padding: 0;
@@ -84,6 +86,42 @@
             padding: 20px;
             border: solid 1px rgb(255, 255, 255);
             color: white;
+            background-color: transparent;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px); /* Ajoutez cette ligne pour iOS */
+            border-radius: 20px;
+            font-family: "Space Mono", monospace;
+            font-weight: 700;
+        }
+
+        .content h2 {
+            text-align: center;
+        }
+
+        .content p {
+            text-align: center;
+        }
+
+        .content ul {
+            list-style-type: none;
+            padding-left: 0;
+
+        }
+
+        .content li {
+            display: flex; /* This makes the items align horizontally */
+            align-items: center; /* This vertically centers the icon and text */
+            margin-top: 2%;
+            padding: 2%;
+            border: solid 1px;
+            text-decoration: none;
+            border-radius: 20px;
+        }
+
+        .content li img {
+            height: 3vh;
+            width: 3vh;
+            margin-right: 10px; /* Adjust the spacing between the icon and the text */
         }
 
         .blob-button {
@@ -119,10 +157,10 @@
             display: block;
             position: absolute;
             content: "";
-            left: calc(50% - 40px);
-            top: calc(50% - 40px);
-            width: 80px;
-            height: 80px;
+            left: calc(50% - 25px);
+            top: calc(50% - 30px);
+            width: 50px;
+            height: 50px;
             border: solid 2px white;
             border-radius: 66% 33% 66% 33% / 33% 33% 66% 66%;
             animation: border_animation 6s linear infinite;
@@ -218,6 +256,50 @@
             height: 100%;
             z-index: 1;
         }
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100vh; /* Toujours 100% de la hauteur de la fenêtre */
+            top: 0;
+            left: 0;
+            background: transparent;
+            z-index: 0; /* Assurez-vous que les étoiles sont derrière les autres éléments */
+            overflow: hidden;
+        }
+
+        .star-layer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: transparent;
+        }
+
+        /* Animation scintillante plus rapide */
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 1;
+            }
+            30% {
+                opacity: 0.2; /* Opacité plus faible pour un effet plus visible */
+            }
+            70% {
+                opacity: 0.7;
+            }
+        }
+
+        /* Appliquer des animations de scintillement à différentes vitesses */
+        #stars1 .star-layer {
+            animation: twinkle 1s linear infinite; /* Animation rapide */
+        }
+
+        #stars2 .star-layer {
+            animation: twinkle 1.5s linear infinite; /* Animation modérée */
+        }
+
+        #stars3 .star-layer {
+            animation: twinkle 2s linear infinite; /* Animation lente */
+        }
+
         /* Pour les écrans de taille petite (smartphones) */
         @media only screen and (max-width: 768px) {
             .div1 {
@@ -228,9 +310,12 @@
 </head>
 
 <body>
+    <div class="stars" id="stars1"></div>
+    <div class="stars" id="stars2"></div>
+    <div class="stars" id="stars3"></div>
     <div class="blob-button" id="blobButton">
         <div class="une-forme"></div>
-        <a id="menu" href="index.html">Retour</a>
+        <a id="menu" href="index.html"><i class="fas fa-home"></i></a>
     </div> 
     <!-- Conteneur Principal qui englobe div1 et div2 -->
     <div class="main-container">
@@ -242,7 +327,7 @@
                     <defs>
                         <path id="circlePath1" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 " />
                     </defs>
-                    <text fill="white" font-family="'Helvetica Neue', Arial" font-size="40" font-weight="bold">
+                    <text fill="white" font-family="'Space Mono', Arial" font-size="40" font-weight="bold">
                         <textPath xlink:href="#circlePath1">Myself</textPath>
                     </text>
                 </svg>
@@ -252,8 +337,12 @@
         <!-- Div 2 -->
         <div class="div2">
             <div class="content">
-                <h2>Introduction</h2>
-                <p>Welcome to my portfolio! My name is Dawa Tran Quang-Tru, I'm 25 years old and currently living in Nancy, France. I am passionate about digital sciences, computer science, and graphic design. My mind is always eager to solve real-world problems, and I love to innovate and develop new things. I am a native French speaker, but I also speak English fluently (level 895). Outside of my professional life, I enjoy traveling, exploring different cuisines, and swimming—water is truly my second element. Through this portfolio, you'll learn more about my journey, professional experiences, education, and the things that inspire me..</p>
+                <h2 class="glitch-text">Introduction</h2>
+                <p>Hi, I'm Dawa Tran Quang-Tru, and I currently live in Nancy, France. I have Vietnamese roots and I'm 25 years old. I really love science and the environment. My family has been interested in these things for generations, so I've always been curious about them.</p>
+                <p>I'm kind of quiet but also like talking to people. I enjoy thinking about stuff on my own, but I also like having good conversations with different people.</p>
+                <p>I really enjoy trying different foods. I love the taste of Italian food and Middle Eastern dishes. Eating these foods feels like going on a journey, just like when I learn new things.</p>
+                <p>I'm good at English, so I can talk and have conversations easily. I also know a bit of Spanish, which helps me connect with more people and cultures.</p>
+                <p>This portfolio is a way for me to showcase my love for science, nature, and learning. It's where my experiences and passion for solving problems come together.</p>
             </div>
         </div>
     </div>
@@ -266,7 +355,7 @@
                     <defs>
                         <path id="circlePath1" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 " />
                     </defs>
-                    <text fill="white" font-family="'Helvetica Neue', Arial" font-size="40" font-weight="bold">
+                    <text fill="white" font-family="'Space Mono', Arial" font-size="40" font-weight="bold">
                         <textPath xlink:href="#circlePath1">Myself</textPath>
                     </text>
                 </svg>
@@ -276,8 +365,24 @@
         <!-- Div 2 -->
         <div class="div2">
             <div class="content">
-                <h2>Introduction</h2>
-                <p>Welcome to my portfolio! My name is Dawa Tran Quang-Tru, I'm 25 years old and currently living in Nancy, France. I am passionate about digital sciences, computer science, and graphic design. My mind is always eager to solve real-world problems, and I love to innovate and develop new things. I am a native French speaker, but I also speak English fluently (level 895). Outside of my professional life, I enjoy traveling, exploring different cuisines, and swimming—water is truly my second element. Through this portfolio, you'll learn more about my journey, professional experiences, education, and the things that inspire me..</p>
+                <h2 class="glitch-text">Experiences</h2>
+                <p>Currently, I am working at Nord-Est Géo Environnement (NEGE), a consultancy firm founded in 2011. Since October 2022, I have been involved in various projects related to urban planning, territorial diagnostics, and environmental studies. My role includes:</p>
+                <ul>
+                    <li><img src="icon/svg/document.svg" alt="Image" />Creation of urban planning documents</li>
+                    <li><img src="icon/svg/enquete.svg" alt="Image" />Territory diagnostics</li>
+                    <li><img src="icon/svg/carte.svg" alt="Image" />Creation of maps and graphic productions</li>
+                    <li><img src="icon/svg/analyse.svg" alt="Image" />Data collection, processing, and analysis</li>
+                    <li><img src="icon/svg/meeting.svg" alt="Image" />Participation in public or working meetings</li>
+                    <li><img src="icon/svg/terrain.svg" alt="Image" />Field studies with officials and residents</li>
+                </ul>
+                <p>Past experiences include:</p>
+                <ul>
+                    <li><img src="icon/svg/loterr.svg" alt="Image" />Internship related to Master's 1 degree, research on the evolution of vegetable gardens in Lorraine</li>
+                    <li><img src="icon/svg/chef.svg" alt="Image" />Cook at the "Le Voyou" restaurant in Nancy</li>
+                    <li><img src="icon/svg/uber.svg" alt="Image" />Bicycle courier</li>
+                    <li><img src="icon/svg/silo.svg" alt="Image" />Worker in a grain silo</li>
+                    <li><img src="icon/svg/chef.svg" alt="Image" />Versatile worker in a fast-food chain</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -290,7 +395,7 @@
                     <defs>
                         <path id="circlePath1" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 " />
                     </defs>
-                    <text fill="white" font-family="'Helvetica Neue', Arial" font-size="40" font-weight="bold">
+                    <text fill="white" font-family="'Space Mono', Arial" font-size="40" font-weight="bold">
                         <textPath xlink:href="#circlePath1">Myself</textPath>
                     </text>
                 </svg>
@@ -300,33 +405,17 @@
         <!-- Div 2 -->
         <div class="div2">
             <div class="content">
-                <h2>Introduction</h2>
-                <p>Welcome to my portfolio! My name is Dawa Tran Quang-Tru, I'm 25 years old and currently living in Nancy, France. I am passionate about digital sciences, computer science, and graphic design. My mind is always eager to solve real-world problems, and I love to innovate and develop new things. I am a native French speaker, but I also speak English fluently (level 895). Outside of my professional life, I enjoy traveling, exploring different cuisines, and swimming—water is truly my second element. Through this portfolio, you'll learn more about my journey, professional experiences, education, and the things that inspire me..</p>
-            </div>
-        </div>
-    </div>
-    <div class="main-container">
-        <!-- Div 1 -->
-        <div class="div1">
-            <div class="globe-container" id="globe4"></div>
-            <div class="rotating-text">
-                <svg viewBox="0 0 300 300">
-                    <defs>
-                        <path id="circlePath1" d="M 150, 150 m -80, 0 a 80,80 0 0,1 160,0 a 80,80 0 0,1 -160,0 " />
-                    </defs>
-                    <text fill="white" font-family="'Helvetica Neue', Arial" font-size="40" font-weight="bold">
-                        <textPath xlink:href="#circlePath1">Myself</textPath>
-                    </text>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Div 2 -->
-        <div class="div2">
-            <div class="content">
-                <h2>Introduction</h2>
-                <p>Welcome to my portfolio! My name is Dawa Tran Quang-Tru, I'm 25 years old and currently living in Nancy, France. I am passionate about digital sciences, computer science, and graphic design. My mind is always eager to solve real-world problems, and I love to innovate and develop new things. I am a native French speaker, but I also speak English fluently (level 895). Outside of my professional life, I enjoy traveling, exploring different cuisines, and swimming—water is truly my second element. Through this portfolio, you'll learn more about my journey, professional experiences, education, and the things that inspire me..</p>
-            </div>
+                <h2 class="glitch-text">Education</h2>
+                <p>My educational journey has provided me with a strong foundation in scientific methods, tools, and technologies. I've gained expertise in software like QGIS, ArcGIS, Blender, and the Adobe Suite. I’ve also developed skills in HTML, CSS, and Python, allowing me to explore both cartography and 3D modeling.</p>
+                <p>My academic background includes:</p>
+                <ul>
+                    <li>2023 - 2024: Master’s in Geomatics Applied to Urban Risks, CYU Cergy-Pontoise</li>
+                    <li>2021 - 2023: Master’s in Geography and Urban Planning, SHS Nancy</li>
+                    <li>2018 - 2021: Bachelor’s in Geography and Urban Planning, SHS Nancy</li>
+                    <li>2017 - 2018: Year 1 in Physics-Chemistry and Civil Engineering, Faculty of Sciences and Technology</li>
+                    <li>2015 - 2017: Scientific Baccalaureate, General Polyvalent High School</li>
+                </ul>
+            </div>            
         </div>
     </div>
     <div class="section globe-geant-section">
@@ -339,7 +428,133 @@
         </div>          
         <div class="globe-container-geant" id="globeGeant"></div>
     </div>
+    <script src="//unpkg.com/globe.gl"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const chars = "☺Σ×Π#-_¯—→↓↑←0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZ";
+    
+        var Glitch = function(selector, index, numberOfGlitchedLetter, timeGlitch, timePerLetter, timeBetweenGlitch) {
+            this.selector = selector;
+            this.index = index;
+            this.numberOfGlitchedLetter = numberOfGlitchedLetter;
+            this.innerText;
+            this.charArray = [];
+            this.charIndex = [];
+            this.timeGlitch = timeGlitch;
+            this.timeBetweenGlitch = timeBetweenGlitch;
+            this.timePerLetter = timePerLetter;
+            this.maxCount = Math.floor(this.timeGlitch / this.timePerLetter);
+            this.count = 0;
+        }
+    
+        Glitch.prototype.init = function() {
+            this.innerText = this.selector.innerText;
+            this.charArray = this.innerText.split("");
+            if (this.numberOfGlitchedLetter == undefined || this.numberOfGlitchedLetter > this.innerText.length) {
+                this.numberOfGlitchedLetter = this.innerText.length;
+            }
+            this.defineCharIndexToRandomize();
+        }
+    
+        Glitch.prototype.defineCharIndexToRandomize = function() {
+            this.charIndex = [];
+            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
+                let randCharIndex = Math.floor(Math.random() * this.charArray.length);
+                this.charIndex.push(randCharIndex);
+            }
+        }
+    
+        Glitch.prototype.randomize = function() {
+            //copy the char array
+            let randomString = Array.from(this.charArray);
+    
+            //randomize char
+            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
+                let randIndex = Math.floor(Math.random() * chars.length);
+                let randCharIndex = this.charIndex[i];
+                if (randomString[randCharIndex] !== ' ') {
+                    randomString[randCharIndex] = chars[randIndex];
+                }
+            }
+            this.selector.innerText = randomString.join("");
+        }
+    
+        Glitch.prototype.update = function(interval) {
+            if (this.count >= this.maxCount - 1) {
+                this.selector.innerText = this.innerText;
+                this.defineCharIndexToRandomize();
+                let ctx = this;
+                let wait = setTimeout(function() {
+                    ctx.count = 0;
+                }, this.timeBetweenGlitch);
+            } else {
+                this.randomize();
+                this.count++;
+            }
+        }
+    
+        Glitch.prototype.glitch = function() {
+            let ctx = this;
+            let interval = setInterval(function() {
+                ctx.update(this);
+            }, this.timePerLetter);
+        }
+    
+        var glitchArray = [];
+    
+        function initGlitchText() {
+            const glitchTextElements = document.querySelectorAll(".glitch-text");
+            glitchTextElements.forEach((selector, i) => {
+                let randLetterNumber = 2 + Math.floor(Math.random() * 8);
+                let randGlitchPauseTime = 500 + Math.floor(Math.random() * 2500);
+                let glitch = new Glitch(selector, i, randLetterNumber, 200, 65, randGlitchPauseTime);
+                glitch.init();
+                glitchArray.push(glitch);
+            });
+        }
+    
+        function startGlitch() {
+            glitchArray.forEach(glitch => {
+                glitch.glitch();
+            });
+        }
+    
+        // Initialize and start the glitch effect
+        initGlitchText();
+        startGlitch();
+    </script>    
+    <script>
+        function createStars(layerId, numStars, starSize, minTwinkleTime, maxTwinkleTime) {
+            const starsContainer = document.getElementById(layerId);
+            
+            for (let i = 0; i < numStars; i++) {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+
+                const starElement = document.createElement('div');
+                starElement.classList.add('star-layer');
+                starElement.style.width = `${starSize}px`;
+                starElement.style.height = `${starSize}px`;
+                starElement.style.backgroundColor = '#FFF';
+                starElement.style.position = 'absolute';
+                starElement.style.top = `${y}px`;
+                starElement.style.left = `${x}px`;
+
+                // Durée et délai d'animation aléatoires
+                const twinkleDuration = Math.random() * (maxTwinkleTime - minTwinkleTime) + minTwinkleTime;
+                const twinkleDelay = Math.random() * twinkleDuration;
+                starElement.style.animationDuration = `${twinkleDuration}s`;
+                starElement.style.animationDelay = `${twinkleDelay}s`;
+
+                starsContainer.appendChild(starElement);
+            }
+        }
+
+        // Créer des étoiles avec un scintillement plus rapide
+        createStars('stars1', 100, 1, 0.5, 2); // Petite taille, scintillement rapide
+        createStars('stars2', 100, 2, 1, 3); // Taille moyenne, scintillement modéré
+        createStars('stars3', 100, 3, 1.5, 4); // Grande taille, scintillement plus lent
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const blobButton = document.getElementById('blobButton');
@@ -388,10 +603,10 @@
     
         // Initialiser les globes normaux avec rotation automatique
         $(document).ready(function () {
-            createGlobe('globe1', 'textures/MOON.jpg', 'textures/BUMP.jpg', 1.0); // Globe 1 avec rotation rapide
-            createGlobe('globe2', '//unpkg.com/three-globe/example/img/earth-night.jpg', 'textures/BUMP.jpg', 0.5); // Globe 2 avec rotation moyenne
-            createGlobe('globe3', 'textures/MOON.jpg', 'textures/BUMP.jpg', 1.0); // Globe 3 avec rotation rapide
-            createGlobe('globe4', '//unpkg.com/three-globe/example/img/earth-night.jpg', 'textures/BUMP.jpg', 0.5); // Globe 4 avec rotation moyenne
+            createGlobe('globe1', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 1.0); // Globe 1 avec rotation rapide
+            createGlobe('globe2', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 0.5); // Globe 2 avec rotation moyenne
+            createGlobe('globe3', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 1.0); // Globe 3 avec rotation rapide
+            createGlobe('globe4', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 0.5); // Globe 4 avec rotation moyenne
         });
     </script>    
     <script type="module">
@@ -399,8 +614,8 @@
     
         $(document).ready(function () {
             const globeGeant = Globe()
-                .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-                .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+                .globeImageUrl('textures/WEBP/HD/EARTH.webp')
+                .bumpImageUrl('textures/WEBP/HD/BUMP.webp')
                 .backgroundColor('rgba(0, 0, 0, 0)') // Fond transparent
                 (document.getElementById('globeGeant'));
     
