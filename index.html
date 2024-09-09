@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVG avec texte tournant, Blob animé et texte au survol</title>
+    <script src="//unpkg.com/globe.gl"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body, html { 
             margin: 0; 
@@ -12,6 +15,7 @@
             background: #000000;
             font-family: Arial, sans-serif;
             overflow-x: hidden;
+            overflow-y: scroll; /* Assure le défilement vertical sur mobile */
         }
 
         #globeViz {
@@ -175,11 +179,70 @@
             animation: ani-mouse 2.5s linear infinite;
         }
 
+        /* Ajout de l'animation */
+        @keyframes ani-mouse {
+            0% {
+                top: 29%;
+                opacity: 1;
+            }
+            50% {
+                top: 70%;
+                opacity: 0.5;
+            }
+            100% {
+                top: 29%;
+                opacity: 1;
+            }
+        }
+
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100vh; /* Toujours 100% de la hauteur de la fenêtre */
+            top: 0;
+            left: 0;
+            background: transparent;
+            z-index: 0; /* Assurez-vous que les étoiles sont derrière les autres éléments */
+            overflow: hidden;
+        }
+
+        .star-layer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: transparent;
+        }
+
+        /* Animation scintillante plus rapide */
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 1;
+            }
+            30% {
+                opacity: 0.2; /* Opacité plus faible pour un effet plus visible */
+            }
+            70% {
+                opacity: 0.7;
+            }
+        }
+
+        /* Appliquer des animations de scintillement à différentes vitesses */
+        #stars1 .star-layer {
+            animation: twinkle 1s linear infinite; /* Animation rapide */
+        }
+
+        #stars2 .star-layer {
+            animation: twinkle 1.5s linear infinite; /* Animation modérée */
+        }
+
+        #stars3 .star-layer {
+            animation: twinkle 2s linear infinite; /* Animation lente */
+        }
         @media only screen and (max-width: 768px) {
             /* Blob animé sous l'icône */
             .une-forme {
-                width: 75px; /* Largeur du blob */
-                height: 75px; /* Hauteur du blob */
+                width: 60px; /* Largeur du blob */
+                height: 60px; /* Hauteur du blob */
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -194,9 +257,9 @@
                 height: 75px; /* Hauteur du blob */
             }
             #svg1 { top: 8%; left: 50%; transform: translate(-50%, 0); } /* En haut, centré horizontalement */
-            #svg2 { top: 50%; right: 8%; transform: translate(0, -50%); } /* À droite, centré verticalement */
+            #svg2 { top: 50%; right: 10%; transform: translate(0, -50%); } /* À droite, centré verticalement */
             #svg3 { bottom: 8%; left: 50%; transform: translate(-50%, 0); } /* En bas, centré horizontalement */
-            #svg4 { top: 50%; left: 8%; transform: translate(0, -50%); } /* À gauche, centré verticalement */
+            #svg4 { top: 50%; left: 10%; transform: translate(0, -50%); } /* À gauche, centré verticalement */
 
             #text {
                 color: white;
@@ -209,7 +272,9 @@
 </head>
 <body>
     <div id="globeViz"></div>
-    
+    <div class="stars" id="stars1"></div>
+    <div class="stars" id="stars2"></div>
+    <div class="stars" id="stars3"></div>
     <!-- Ajout des SVG cliquables avec une animation blob et texte tournant au survol -->
     <a href="page2.html" class="image-svg-container" id="svg1">
         <svg class="image-svg" viewBox="0 0 24 24">
@@ -271,47 +336,115 @@
                 <p id="text">Retour à l'accueil</p>
             </div>
         </div>
-    </a>    
-
+    </a>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/circletype@2.3.0/dist/circletype.min.js"></script>
     <script>
-        // Initialisation de la scène, de la caméra et du renderer
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('globeViz').appendChild(renderer.domElement);
+        function createStars(layerId, numStars, starSize, minTwinkleTime, maxTwinkleTime) {
+            const starsContainer = document.getElementById(layerId);
+            
+            for (let i = 0; i < numStars; i++) {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
 
-        // Fonction pour mettre à jour la taille du globe
-        function updateGlobeSize() {
-            const scaleFactor = Math.min(window.innerWidth, window.innerHeight) / 1000;
-            const scaledGlobeRadius = 8 * scaleFactor; // 8 est la taille de base du globe
-            globe.geometry = new THREE.SphereGeometry(scaledGlobeRadius, 50, 50);
-            camera.position.z = scaledGlobeRadius * 5; // Ajustement de la position de la caméra pour un globe plus petit
+                const starElement = document.createElement('div');
+                starElement.classList.add('star-layer');
+                starElement.style.width = `${starSize}px`;
+                starElement.style.height = `${starSize}px`;
+                starElement.style.backgroundColor = '#FFF';
+                starElement.style.position = 'absolute';
+                starElement.style.top = `${y}px`;
+                starElement.style.left = `${x}px`;
+
+                // Durée et délai d'animation aléatoires
+                const twinkleDuration = Math.random() * (maxTwinkleTime - minTwinkleTime) + minTwinkleTime;
+                const twinkleDelay = Math.random() * twinkleDuration;
+                starElement.style.animationDuration = `${twinkleDuration}s`;
+                starElement.style.animationDelay = `${twinkleDelay}s`;
+
+                starsContainer.appendChild(starElement);
+            }
         }
 
-        // Chemin vers l'image personnalisée
-        const customTextureUrl = 'textures/NUIT.jpg'; // Remplacez par le chemin de votre image
+        // Créer des étoiles avec un scintillement plus rapide
+        createStars('stars1', 100, 1, 0.5, 2); // Petite taille, scintillement rapide
+        createStars('stars2', 100, 2, 1, 3); // Taille moyenne, scintillement modéré
+        createStars('stars3', 100, 3, 1.5, 4); // Grande taille, scintillement plus lent
+    </script>
+    <script type="module">
+        import * as THREE from '//unpkg.com/three/build/three.module.js';
 
-        // Création du globe avec l'image personnalisée
-        const geometry = new THREE.SphereGeometry(8, 50, 50); // 8 est la taille de base, mise à jour après
-        const texture = new THREE.TextureLoader().load(customTextureUrl);
-        const material = new THREE.MeshBasicMaterial({ map: texture });
-        const globe = new THREE.Mesh(geometry, material);
-        scene.add(globe);
+        // Initialisation du globe avec les nouvelles images
+        const world = Globe()
+            .globeImageUrl('textures/WEBP/HD/EARTH.webp')
+            .bumpImageUrl('textures/WEBP/HD/BUMP.webp')
+            .backgroundColor('rgba(0, 0, 0, 0)')
+            (document.getElementById('globeViz'));
 
-        // Appel initial pour ajuster la taille du globe
-        updateGlobeSize();
+        // Personnalisation du globe avec la texture d'eau et la brillance
+        const globeMaterial = world.globeMaterial();
+        globeMaterial.bumpScale = 50;
+        new THREE.TextureLoader().load('textures/WEBP/HD/EAU.webp', texture => {
+            globeMaterial.specularMap = texture;
+            globeMaterial.specular = new THREE.Color('grey');
+            globeMaterial.shininess = 50;
+        });
 
-        // Fonction de rendu
-        const animate = function () {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        };
+        const directionalLight = world.lights().find(light => light.type === 'DirectionalLight');
+        directionalLight && directionalLight.position.set(10, 100, 10);
 
-        animate();
+        // Désactiver les interactions manuelles
+        world.controls().enableZoom = false;
+        world.controls().enableRotate = false;
 
+        function updateCameraZoom() {
+            if (window.innerWidth <= 768) {
+                // Dézoom sur mobile en augmentant le champ de vision (FOV)
+                world.camera().fov = 75;  // Augmenter le FOV pour un effet de dézoom
+            } else {
+                // Rétablir le FOV pour les écrans plus grands
+                world.camera().fov = 50;  // FOV par défaut pour un effet normal
+            }
+            world.camera().updateProjectionMatrix();  // Mise à jour de la projection
+        }
+
+        updateCameraZoom(); // Appel initial
+        window.addEventListener('resize', updateCameraZoom);
+
+        // Fonction pour ajuster la taille du globe au redimensionnement de la fenêtre
+        function updateGlobeSize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            world.width(width).height(height);
+        }
+
+        updateGlobeSize(); // Initial call
+        window.addEventListener('resize', updateGlobeSize);
+
+        // Gestion du défilement pour la rotation du globe
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.scrollY;
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+
+            // Calcul de la fraction de défilement
+            const scrollFraction = scrollPosition / maxScroll;
+
+            // Convertir la fraction de défilement en un angle de rotation (de 0 à 360 degrés)
+            const rotationAngle = (scrollFraction * 2 * Math.PI) % (2 * Math.PI);
+
+            // Appliquer la rotation du globe
+            world.controls().autoRotate = false;
+            world.scene().rotation.y = rotationAngle;
+
+            // Afficher ou masquer les SVG en fonction de la position de défilement
+            document.getElementById('svg1').style.opacity = (scrollFraction > 0.1 && scrollFraction < 0.3) ? 1 : 0;
+            document.getElementById('svg2').style.opacity = (scrollFraction > 0.3 && scrollFraction < 0.5) ? 1 : 0;
+            document.getElementById('svg3').style.opacity = (scrollFraction > 0.5 && scrollFraction < 0.7) ? 1 : 0;
+            document.getElementById('svg4').style.opacity = (scrollFraction > 0.7 && scrollFraction < 0.9) ? 1 : 0;
+        });
+    </script>
+    <script>
         // Rotation du globe en fonction du défilement
         window.addEventListener('scroll', () => {
             const scrollPosition = window.scrollY;
@@ -321,12 +454,6 @@
 
             // Calculer la fraction de défilement
             const scrollFraction = scrollPosition / maxScroll;
-
-            // Convertir la fraction de défilement en un angle de rotation (de 0 à 360 degrés)
-            const rotationAngle = (scrollFraction * 2 * Math.PI) % (2 * Math.PI); // Rotation infinie
-
-            // Appliquer la rotation du globe
-            globe.rotation.y = rotationAngle;
 
             // Afficher ou masquer les SVG en fonction de la position de défilement
             document.getElementById('svg1').style.opacity = (scrollFraction > 0.1 && scrollFraction < 0.3) ? 1 : 0;
@@ -341,7 +468,7 @@
                 window.scrollTo(0, maxScroll - 1); // Revenir en bas de la page lorsqu'on est en haut
             }
 
-            if (scrollPosition > 2000) {
+            if (scrollPosition > 1000) {
                 document.getElementById('scrollBtn').style.opacity = '0';
                 document.getElementById('scrollBtn').style.pointerEvents = 'none'; // Désactive les clics
             } else {
