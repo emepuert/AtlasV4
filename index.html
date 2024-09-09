@@ -19,8 +19,8 @@
         }
 
         #globeViz {
-            width: 100vw; 
-            height: 100vh;
+            width: 100%; 
+            height: 100%;
             position: fixed; 
             top: 0; 
             left: 0;
@@ -427,21 +427,25 @@
             const scrollPosition = window.scrollY;
             const maxScroll = document.body.scrollHeight - window.innerHeight;
 
-            // Calcul de la fraction de défilement
             const scrollFraction = scrollPosition / maxScroll;
 
-            // Convertir la fraction de défilement en un angle de rotation (de 0 à 360 degrés)
-            const rotationAngle = (scrollFraction * 2 * Math.PI) % (2 * Math.PI);
+            // Gestion de l'opacité et des clics pour chaque SVG
+            const svg1 = document.getElementById('svg1');
+            const svg2 = document.getElementById('svg2');
+            const svg3 = document.getElementById('svg3');
+            const svg4 = document.getElementById('svg4');
 
-            // Appliquer la rotation du globe
-            world.controls().autoRotate = false;
-            world.scene().rotation.y = rotationAngle;
+            svg1.style.opacity = (scrollFraction > 0.1 && scrollFraction < 0.3) ? 1 : 0;
+            svg1.style.pointerEvents = (scrollFraction > 0.1 && scrollFraction < 0.3) ? 'auto' : 'none';
 
-            // Afficher ou masquer les SVG en fonction de la position de défilement
-            document.getElementById('svg1').style.opacity = (scrollFraction > 0.1 && scrollFraction < 0.3) ? 1 : 0;
-            document.getElementById('svg2').style.opacity = (scrollFraction > 0.3 && scrollFraction < 0.5) ? 1 : 0;
-            document.getElementById('svg3').style.opacity = (scrollFraction > 0.5 && scrollFraction < 0.7) ? 1 : 0;
-            document.getElementById('svg4').style.opacity = (scrollFraction > 0.7 && scrollFraction < 0.9) ? 1 : 0;
+            svg2.style.opacity = (scrollFraction > 0.3 && scrollFraction < 0.5) ? 1 : 0;
+            svg2.style.pointerEvents = (scrollFraction > 0.3 && scrollFraction < 0.5) ? 'auto' : 'none';
+
+            svg3.style.opacity = (scrollFraction > 0.5 && scrollFraction < 0.7) ? 1 : 0;
+            svg3.style.pointerEvents = (scrollFraction > 0.5 && scrollFraction < 0.7) ? 'auto' : 'none';
+
+            svg4.style.opacity = (scrollFraction > 0.7 && scrollFraction < 0.9) ? 1 : 0;
+            svg4.style.pointerEvents = (scrollFraction > 0.7 && scrollFraction < 0.9) ? 'auto' : 'none';
         });
     </script>
     <script>
