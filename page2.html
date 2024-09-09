@@ -167,6 +167,8 @@
             animation: border_animation 6s linear infinite;
             background-color: transparent;
             transition: background-color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px); /* Ajoutez cette ligne pour iOS */
         }
 
         @keyframes border_animation {

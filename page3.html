@@ -5,12 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galerie Photo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
         body, html {
             background-color: black;
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
+            font-family: "Space Mono", monospace;
+            font-weight: 700;
         }
 
         figure {
@@ -23,9 +28,10 @@
 
         .gallery-item {
             position: relative;
-            background-color: black;
+            background-color: transparent;
             aspect-ratio: 1 / 1; /* Pour garder un carré parfait */
             overflow: hidden;
+            border-radius: 20px;
         }
 
         img {
@@ -82,6 +88,7 @@
         #menu {
             color: white;
             transition: color 0.3s ease;
+            font-size: xx-large;
         }
 
         .blob-button .une-forme {
@@ -104,6 +111,8 @@
             animation: border_animation 6s linear infinite;
             background-color: transparent;
             transition: background-color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px); /* Ajoutez cette ligne pour iOS */
         }
 
         @keyframes border_animation {
@@ -134,6 +143,50 @@
             position: relative;
         }
 
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100vh; /* Toujours 100% de la hauteur de la fenêtre */
+            top: 0;
+            left: 0;
+            background: transparent;
+            z-index: 0; /* Assurez-vous que les étoiles sont derrière les autres éléments */
+            overflow: hidden;
+        }
+
+        .star-layer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: transparent;
+        }
+
+        /* Animation scintillante plus rapide */
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 1;
+            }
+            30% {
+                opacity: 0.2; /* Opacité plus faible pour un effet plus visible */
+            }
+            70% {
+                opacity: 0.7;
+            }
+        }
+
+        /* Appliquer des animations de scintillement à différentes vitesses */
+        #stars1 .star-layer {
+            animation: twinkle 1s linear infinite; /* Animation rapide */
+        }
+
+        #stars2 .star-layer {
+            animation: twinkle 1.5s linear infinite; /* Animation modérée */
+        }
+
+        #stars3 .star-layer {
+            animation: twinkle 2s linear infinite; /* Animation lente */
+        }
+
         @media (min-width: 500px) {
             figure {
                 grid-template-columns: repeat(1, 1fr);
@@ -155,12 +208,15 @@
 </head>
 
 <body>
+    <div class="stars" id="stars1"></div>
+    <div class="stars" id="stars2"></div>
+    <div class="stars" id="stars3"></div>
     <figure>
         <!-- Bouton Retour avec blob -->
         <div class="gallery-item">
             <div class="blob-button" id="blobButton">
                 <div class="une-forme"></div>
-                <a href="index.html" id="menu">Retour</a>
+                <a id="menu" href="index.html"><i class="fas fa-home"></i></a>
             </div>
         </div>
 
@@ -198,6 +254,38 @@
         </div>
     </figure>
 </body>
+<script>
+    function createStars(layerId, numStars, starSize, minTwinkleTime, maxTwinkleTime) {
+        const starsContainer = document.getElementById(layerId);
+        
+        for (let i = 0; i < numStars; i++) {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+
+            const starElement = document.createElement('div');
+            starElement.classList.add('star-layer');
+            starElement.style.width = `${starSize}px`;
+            starElement.style.height = `${starSize}px`;
+            starElement.style.backgroundColor = '#FFF';
+            starElement.style.position = 'absolute';
+            starElement.style.top = `${y}px`;
+            starElement.style.left = `${x}px`;
+
+            // Durée et délai d'animation aléatoires
+            const twinkleDuration = Math.random() * (maxTwinkleTime - minTwinkleTime) + minTwinkleTime;
+            const twinkleDelay = Math.random() * twinkleDuration;
+            starElement.style.animationDuration = `${twinkleDuration}s`;
+            starElement.style.animationDelay = `${twinkleDelay}s`;
+
+            starsContainer.appendChild(starElement);
+        }
+    }
+
+    // Créer des étoiles avec un scintillement plus rapide
+    createStars('stars1', 100, 1, 0.5, 2); // Petite taille, scintillement rapide
+    createStars('stars2', 100, 2, 1, 3); // Taille moyenne, scintillement modéré
+    createStars('stars3', 100, 3, 1.5, 4); // Grande taille, scintillement plus lent
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const blobButton = document.getElementById('blobButton');
