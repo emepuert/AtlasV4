@@ -8,6 +8,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
         body, html { 
             margin: 0; 
             padding: 0; 
@@ -16,11 +18,14 @@
             font-family: Arial, sans-serif;
             overflow-x: hidden;
             overflow-y: scroll; /* Assure le défilement vertical sur mobile */
+            font-family: "Space Mono", monospace;
+            font-weight: 700;
         }
 
+
         #globeViz {
-            width: 100%; 
-            height: 100%;
+            width: 100vw; 
+            height: 100vh;
             position: fixed; 
             top: 0; 
             left: 0;
@@ -74,6 +79,8 @@
             -webkit-animation: border_animation 6s linear infinite;
             background-color: transparent; /* Initialement transparent */
             transition: background-color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1); /* Transition plus fluide */
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px); /* Ajoutez cette ligne pour iOS */
         }
 
         @keyframes border_animation {
@@ -238,6 +245,72 @@
         #stars3 .star-layer {
             animation: twinkle 2s linear infinite; /* Animation lente */
         }
+
+        .scroll-arrow {
+            position: fixed; /* Utilise position: fixed pour permettre aux flèches de rester visibles pendant le défilement */
+            right: 50px; /* Positionné à droite de l'écran */
+            z-index: 3;
+            width: 10px;
+            height: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 20px; /* Espacement entre les flèches */
+        }
+
+        .scroll-arrow i {
+            color: white;
+            font-size: 1em;
+        }
+
+        /* Blob autour des flèches */
+        .scroll-arrow .une-forme {
+            width: 35px;
+            height: 35px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(10%, 10%);
+            z-index: -1;
+        }
+
+        .scroll-arrow .une-forme::before {
+            display: block;
+            position: absolute;
+            content: "";
+            left: calc(50% - 40px);
+            top: calc(50% - 40px);
+            width: 35px;
+            height: 35px;
+            border: solid 2px white;
+            border-radius: 66% 33% 66% 33% / 33% 33% 66% 66%;
+            animation: border_animation 6s linear infinite;
+            background-color: transparent;
+            transition: background-color 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px); /* Ajoutez cette ligne pour iOS */
+        }
+
+        /* Ajouter une transition au survol */
+        .scroll-arrow:hover .une-forme::before {
+            background-color: white;
+        }
+
+        /* Position des flèches l'une au-dessus de l'autre */
+        .scroll-arrow-up {
+            bottom: 70px; /* Juste au-dessus de la flèche du bas */
+        }
+
+        .scroll-arrow-down {
+            bottom: 20px; /* Positionnée au bas de l'écran */
+        }
+
+        .scroll-arrow:hover i {
+            color: black; /* La flèche devient noire au survol */
+            transition: color 0.3s ease; /* Transition douce pour la couleur */
+        }
+
         @media only screen and (max-width: 768px) {
             /* Blob animé sous l'icône */
             .une-forme {
@@ -266,6 +339,13 @@
                 font-size: 0.9vh; /* Utilisation de vw pour une taille de texte responsive */
                 font-weight: 700;
                 text-transform: uppercase;
+            }
+            .scroll-btn {
+                display: none; /* Masquer le bouton sur mobile */
+            }
+
+            .scroll-arrow {
+                display: block;
             } 
         }
     </style>
@@ -275,6 +355,18 @@
     <div class="stars" id="stars1"></div>
     <div class="stars" id="stars2"></div>
     <div class="stars" id="stars3"></div>
+    <!-- Flèches de défilement -->
+    <!-- Flèches de défilement -->
+    <!-- Flèches de défilement -->
+    <div class="scroll-arrow scroll-arrow-up" id="scrollUp">
+        <div class="une-forme"></div>
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <div class="scroll-arrow scroll-arrow-down" id="scrollDown">
+        <div class="une-forme"></div>
+        <i class="fas fa-arrow-down"></i>
+    </div>
     <!-- Ajout des SVG cliquables avec une animation blob et texte tournant au survol -->
     <a href="page2.html" class="image-svg-container" id="svg1">
         <svg class="image-svg" viewBox="0 0 24 24">
@@ -340,6 +432,15 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/circletype@2.3.0/dist/circletype.min.js"></script>
+    <script>
+        document.getElementById('scrollUp').addEventListener('click', () => {
+            window.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
+        });
+
+        document.getElementById('scrollDown').addEventListener('click', () => {
+            window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+        });
+    </script>
     <script>
         function createStars(layerId, numStars, starSize, minTwinkleTime, maxTwinkleTime) {
             const starsContainer = document.getElementById(layerId);
@@ -427,25 +528,33 @@
             const scrollPosition = window.scrollY;
             const maxScroll = document.body.scrollHeight - window.innerHeight;
 
+            // Calcul de la fraction de défilement
             const scrollFraction = scrollPosition / maxScroll;
 
-            // Gestion de l'opacité et des clics pour chaque SVG
-            const svg1 = document.getElementById('svg1');
-            const svg2 = document.getElementById('svg2');
-            const svg3 = document.getElementById('svg3');
-            const svg4 = document.getElementById('svg4');
+            // Convertir la fraction de défilement en un angle de rotation (de 0 à 360 degrés)
+            const rotationAngle = (scrollFraction * 2 * Math.PI) % (2 * Math.PI);
 
-            svg1.style.opacity = (scrollFraction > 0.1 && scrollFraction < 0.3) ? 1 : 0;
-            svg1.style.pointerEvents = (scrollFraction > 0.1 && scrollFraction < 0.3) ? 'auto' : 'none';
+            // Appliquer la rotation du globe
+            world.controls().autoRotate = false;
+            world.scene().rotation.y = rotationAngle;
 
-            svg2.style.opacity = (scrollFraction > 0.3 && scrollFraction < 0.5) ? 1 : 0;
-            svg2.style.pointerEvents = (scrollFraction > 0.3 && scrollFraction < 0.5) ? 'auto' : 'none';
+            // Fonction pour gérer l'opacité et pointer-events d'un SVG
+            const setSvgVisibility = (elementId, minFraction, maxFraction) => {
+                const element = document.getElementById(elementId);
+                if (scrollFraction > minFraction && scrollFraction < maxFraction) {
+                    element.style.opacity = 1;
+                    element.style.pointerEvents = 'auto';
+                } else {
+                    element.style.opacity = 0;
+                    element.style.pointerEvents = 'none';
+                }
+            };
 
-            svg3.style.opacity = (scrollFraction > 0.5 && scrollFraction < 0.7) ? 1 : 0;
-            svg3.style.pointerEvents = (scrollFraction > 0.5 && scrollFraction < 0.7) ? 'auto' : 'none';
-
-            svg4.style.opacity = (scrollFraction > 0.7 && scrollFraction < 0.9) ? 1 : 0;
-            svg4.style.pointerEvents = (scrollFraction > 0.7 && scrollFraction < 0.9) ? 'auto' : 'none';
+            // Appliquer la visibilité et les interactions pour chaque SVG
+            setSvgVisibility('svg1', 0.1, 0.3);
+            setSvgVisibility('svg2', 0.3, 0.5);
+            setSvgVisibility('svg3', 0.5, 0.7);
+            setSvgVisibility('svg4', 0.7, 0.9);
         });
     </script>
     <script>
