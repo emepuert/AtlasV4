@@ -107,7 +107,7 @@
         }
 
         .image-svg-container:hover .image-svg {
-            fill: black; /* Le SVG change de couleur au survol */
+            fill: rgb(0, 0, 0); /* Le SVG change de couleur au survol */
             transition: fill 0.7s cubic-bezier(0.25, 0.1, 0.25, 1); /* Transition plus fluide */
         }
 
@@ -147,6 +147,28 @@
         #svg3 { bottom: 5%; left: 50%; transform: translate(-50%, 0); } /* En bas, centré horizontalement */
         #svg4 { top: 50%; left: 5%; transform: translate(0, -50%); } /* À gauche, centré verticalement */
 
+        #svg4 .une-forme::before {
+            border: solid 2px red;
+        }
+
+        #svg4 .rotating-text p {
+            color: red; /* Le texte de svg4 est rouge */
+            transition: color 0.7s ease;
+        }
+
+        #svg4 .image-svg {
+            color: red !important;
+            fill: red; /* Couleur du SVG initiale */
+        }
+
+        #svg4:hover .une-forme::before {
+            background-color: red; /* Changement en rouge au survol */
+        }
+
+        #svg4:hover .image-svg {
+            fill: black; /* Le SVG passe en rouge au survol */
+        }
+        
         /* Styles pour le bouton de défilement */
         .scroll-btn {
             display: block;
@@ -280,7 +302,7 @@
             position: absolute;
             content: "";
             left: calc(50% - 40px);
-            top: calc(50% - 40px);
+            top: calc(50% - 35px);
             width: 35px;
             height: 35px;
             border: solid 2px white;
@@ -311,11 +333,66 @@
             transition: color 0.3s ease; /* Transition douce pour la couleur */
         }
 
+        /* Pop-up Overlay */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Pop-up Content */
+        .popup-content {
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.7); /* Réduit la taille initialement */
+            transition: transform 0.3s ease; /* Transition pour l'agrandissement */
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px); /* Ajoutez cette ligne pour iOS */
+            color: white;
+            background-color: none;
+            border: solid 1px white;
+        }
+
+        /* Close Button */
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .close:hover {
+            color: red;
+        }
+
+        /* Classe pour afficher le pop-up */
+        .popup-overlay.show {
+            display: flex;
+            opacity: 1; /* Augmentation progressive de l'opacité */
+        }
+
+        .popup-overlay.show .popup-content {
+            transform: scale(1); /* L'effet smooth lors de l'apparition */
+        }
+
         @media only screen and (max-width: 768px) {
             /* Blob animé sous l'icône */
             .une-forme {
-                width: 60px; /* Largeur du blob */
-                height: 60px; /* Hauteur du blob */
+                width: 100px; /* Largeur du blob */
+                height: 100px; /* Hauteur du blob */
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -324,19 +401,19 @@
             }
 
             .une-forme::before {
-                left: calc(50% - 40px); /* Ajustement pour centrer le blob */
-                top: calc(50% - 40px);  /* Ajustement pour centrer le blob */
-                width: 75px; /* Largeur du blob */
-                height: 75px; /* Hauteur du blob */
+                left: calc(50% - 65px); /* Ajustement pour centrer le blob */
+                top: calc(50% - 65px);  /* Ajustement pour centrer le blob */
+                width: 125px; /* Largeur du blob */
+                height: 125px; /* Hauteur du blob */
             }
             #svg1 { top: 8%; left: 50%; transform: translate(-50%, 0); } /* En haut, centré horizontalement */
-            #svg2 { top: 50%; right: 10%; transform: translate(0, -50%); } /* À droite, centré verticalement */
+            #svg2 { top: 50%; right: 15%; transform: translate(0, -50%); } /* À droite, centré verticalement */
             #svg3 { bottom: 8%; left: 50%; transform: translate(-50%, 0); } /* En bas, centré horizontalement */
-            #svg4 { top: 50%; left: 10%; transform: translate(0, -50%); } /* À gauche, centré verticalement */
+            #svg4 { top: 50%; left: 15%; transform: translate(0, -50%); } /* À gauche, centré verticalement */
 
             #text {
                 color: white;
-                font-size: 0.9vh; /* Utilisation de vw pour une taille de texte responsive */
+                font-size: 1.5vh !important; /* Utilisation de vw pour une taille de texte responsive */
                 font-weight: 700;
                 text-transform: uppercase;
             }
@@ -374,7 +451,7 @@
         </svg>
         <div class="une-forme">
             <div class="rotating-text">
-                <p id="text">Lorem &#8226; Ipsum &#8226; Dolor &#8226; Sit &#8226; Amet &#8226;</p>
+                <p id="text">Introduction &#8226; Introduction &#8226;</p>
             </div>
         </div>
     </a>
@@ -384,7 +461,7 @@
         </svg>
         <div class="une-forme">
             <div class="rotating-text">
-                <p id="text">Lorem &#8226; Ipsum &#8226; Dolor &#8226; Sit &#8226; Amet &#8226;</p>
+                <p id="text">Expertise &#8226; Expertise &#8226;</p>
             </div>
         </div>
     </a>
@@ -394,7 +471,7 @@
         </svg>
         <div class="une-forme">
             <div class="rotating-text">
-                <p id="text">Lorem &#8226; Ipsum &#8226; Dolor &#8226; Sit &#8226; Amet &#8226;</p>
+                <p id="text">Work Gallery &#8226; Work Gallery &#8226;</p>
             </div>
         </div>
     </a>
@@ -404,7 +481,7 @@
         </svg>
         <div class="une-forme">
             <div class="rotating-text">
-                <p id="text">Lorem &#8226; Ipsum &#8226; Dolor &#8226; Sit &#8226; Amet &#8226;</p>
+                <p id="text">Cartotech.fr &#8226; Cartotech.fr &#8226;</p>
             </div>
         </div>
     </a>
@@ -429,16 +506,142 @@
             </div>
         </div>
     </a>
+
+    <div id="popup" class="popup-overlay">
+        <div class="popup-content">
+            <span id="closePopup" class="close">&times;</span>
+            <h2 class="glitch-text-maj" data-text="Cartotech.fr">Cartotech.fr</h2>
+            <p class="glitch-text" data-text="Bienvenue sur Cartotech.fr!">Not Available Now !</p>
+        </div>
+    </div>    
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/circletype@2.3.0/dist/circletype.min.js"></script>
     <script>
-        document.getElementById('scrollUp').addEventListener('click', () => {
-            window.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
+        const chars = "☺Σ×Π#-_¯—→↓↑←0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZ";
+
+        var Glitch = function(selector, index, numberOfGlitchedLetter, timeGlitch, timePerLetter, timeBetweenGlitch) {
+            this.selector = selector;
+            this.index = index;
+            this.numberOfGlitchedLetter = numberOfGlitchedLetter;
+            this.innerText;
+            this.charArray = [];
+            this.charIndex = [];
+            this.timeGlitch = timeGlitch;
+            this.timeBetweenGlitch = timeBetweenGlitch;
+            this.timePerLetter = timePerLetter;
+            this.maxCount = Math.floor(this.timeGlitch / this.timePerLetter);
+            this.count = 0;
+        };
+
+        Glitch.prototype.init = function() {
+            this.innerText = this.selector.innerText;
+            this.charArray = this.innerText.split("");
+            if (this.numberOfGlitchedLetter === undefined || this.numberOfGlitchedLetter > this.innerText.length) {
+                this.numberOfGlitchedLetter = this.innerText.length;
+            }
+            this.defineCharIndexToRandomize();
+        };
+
+        Glitch.prototype.defineCharIndexToRandomize = function() {
+            this.charIndex = [];
+            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
+                let randCharIndex = Math.floor(Math.random() * this.charArray.length);
+                this.charIndex.push(randCharIndex);
+            }
+        };
+
+        Glitch.prototype.randomize = function() {
+            let randomString = Array.from(this.charArray);
+            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
+                let randIndex = Math.floor(Math.random() * chars.length);
+                let randCharIndex = this.charIndex[i];
+                if (randomString[randCharIndex] !== ' ') {
+                    randomString[randCharIndex] = chars[randIndex];
+                }
+            }
+            this.selector.innerText = randomString.join("");
+        };
+
+        Glitch.prototype.update = function(interval) {
+            if (this.count >= this.maxCount - 1) {
+                this.selector.innerText = this.innerText;
+                this.defineCharIndexToRandomize();
+                let ctx = this;
+                setTimeout(function() {
+                    ctx.count = 0;
+                }, this.timeBetweenGlitch);
+            } else {
+                this.randomize();
+                this.count++;
+            }
+        };
+
+        Glitch.prototype.glitch = function() {
+            let ctx = this;
+            let interval = setInterval(function() {
+                ctx.update(this);
+            }, this.timePerLetter);
+        };
+
+        // Applique l'effet glitch aux éléments du popup lors de son ouverture
+        function initGlitchOnPopup() {
+            const glitchTextElements = document.querySelectorAll("#popup .glitch-text");
+            glitchTextElements.forEach((selector, i) => {
+                let randLetterNumber = 2 + Math.floor(Math.random() * 8);
+                let randGlitchPauseTime = 500 + Math.floor(Math.random() * 2500);
+                let glitch = new Glitch(selector, i, randLetterNumber, 200, 65, randGlitchPauseTime);
+                glitch.init();
+                glitch.glitch(); // Commence l'effet de glitch
+            });
+        }
+
+        document.getElementById('svg4').addEventListener('click', function(event) {
+            event.preventDefault(); // Empêche la navigation par défaut
+            const popup = document.getElementById('popup');
+            popup.style.display = 'flex'; // Affiche le conteneur
+            setTimeout(function() {
+                popup.classList.add('show'); // Ajoute la classe pour l'effet smooth
+                initGlitchOnPopup(); // Démarre le glitch sur le texte du popup
+            }, 10); // Légère attente pour que l'animation soit appliquée correctement
         });
 
-        document.getElementById('scrollDown').addEventListener('click', () => {
-            window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+        document.getElementById('closePopup').addEventListener('click', function() {
+            const popup = document.getElementById('popup');
+            popup.classList.remove('show'); // Retire la classe pour commencer l'animation de fermeture
+            setTimeout(function() {
+                popup.style.display = 'none'; // Cache complètement après l'animation
+            }, 300); // Délai correspondant à la durée de la transition
+        });
+    </script>
+    <script>
+        document.getElementById('svg4').addEventListener('click', function(event) {
+            event.preventDefault(); // Empêche la navigation par défaut
+            const popup = document.getElementById('popup');
+            popup.style.display = 'flex'; // Affiche le conteneur
+            setTimeout(function() {
+                popup.classList.add('show'); // Ajoute la classe pour l'effet smooth
+            }, 10); // Légère attente pour que l'animation soit appliquée correctement
+        });
+
+        document.getElementById('closePopup').addEventListener('click', function() {
+            const popup = document.getElementById('popup');
+            popup.classList.remove('show'); // Retire la classe pour commencer l'animation de fermeture
+            setTimeout(function() {
+                popup.style.display = 'none'; // Cache complètement après l'animation
+            }, 300); // Délai correspondant à la durée de la transition
+        });
+
+        // Fermer le pop-up si on clique en dehors du contenu
+        window.addEventListener('click', function(event) {
+            const popup = document.getElementById('popup');
+            if (event.target === popup) {
+                popup.classList.remove('show'); // Retire la classe pour l'effet de fermeture
+                setTimeout(function() {
+                    popup.style.display = 'none'; // Cache le pop-up après l'animation
+                }, 300); // Délai correspondant à la durée de la transition
+            }
         });
     </script>
     <script>
