@@ -432,9 +432,6 @@
     <div class="stars" id="stars1"></div>
     <div class="stars" id="stars2"></div>
     <div class="stars" id="stars3"></div>
-    <!-- Flèches de défilement -->
-    <!-- Flèches de défilement -->
-    <!-- Flèches de défilement -->
     <div class="scroll-arrow scroll-arrow-up" id="scrollUp">
         <div class="une-forme"></div>
         <i class="fas fa-arrow-up"></i>
@@ -518,6 +515,22 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/circletype@2.3.0/dist/circletype.min.js"></script>
+    <script>
+        // Gérer le défilement lorsqu'on clique sur les flèches
+        document.getElementById('scrollUp').addEventListener('click', function() {
+            window.scrollBy({
+                top: -window.innerHeight, // Défile vers le haut d'une hauteur d'écran
+                behavior: 'smooth' // Défilement en douceur
+            });
+        });
+
+        document.getElementById('scrollDown').addEventListener('click', function() {
+            window.scrollBy({
+                top: window.innerHeight, // Défile vers le bas d'une hauteur d'écran
+                behavior: 'smooth' // Défilement en douceur
+            });
+        });
+    </script>
     <script>
         const chars = "☺Σ×Π#-_¯—→↓↑←0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZ";
 
