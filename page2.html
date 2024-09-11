@@ -18,6 +18,7 @@
             background: linear-gradient(#000000 0%, #1a1a4e 25%, #1b6fa6 50%, #2cb5e8 75%, #8fd3f4 100%);
             font-family: Arial, sans-serif;
             overflow-x: hidden;
+            cursor: url('icon/svg/cursor.svg'), pointer;
         }
 
         /* Conteneur principal */
@@ -303,6 +304,12 @@
             animation: twinkle 2s linear infinite; /* Animation lente */
         }
 
+        .profilpic {
+            width: 10vh;
+            height: 10vh;
+            border-radius: 50%;
+        }
+
         /* Pour les écrans de taille petite (smartphones) */
         @media only screen and (max-width: 768px) {
             .div1 {
@@ -324,7 +331,7 @@
     <div class="main-container">
         <!-- Div 1 -->
         <div class="div1">
-            <div class="globe-container" id="globe1"></div>
+            <img src="textures/MOI3.webp" alt="Icon 5" class="profilpic">
             <div class="rotating-text">
                 <svg viewBox="0 0 300 300">
                     <defs>
@@ -352,7 +359,7 @@
     <div class="main-container">
         <!-- Div 1 -->
         <div class="div1">
-            <div class="globe-container" id="globe2"></div>
+            <div class="globe-container" id="globe1"></div>
             <div class="rotating-text">
                 <svg viewBox="0 0 300 300">
                     <defs>
@@ -393,7 +400,7 @@
     <div class="main-container">
         <!-- Div 1 -->
         <div class="div1">
-            <div class="globe-container" id="globe3"></div>
+            <div class="globe-container" id="globe2"></div>
             <div class="rotating-text">
                 <svg viewBox="0 0 300 300">
                     <defs>
@@ -608,8 +615,8 @@
         // Initialiser les globes normaux avec rotation automatique
         $(document).ready(function () {
             createGlobe('globe1', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 1.0); // Globe 1 avec rotation rapide
-            createGlobe('globe2', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 0.5); // Globe 2 avec rotation moyenne
-            createGlobe('globe3', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 1.0); // Globe 3 avec rotation rapide
+            createGlobe('globe2', 'textures/WEBP/EARTH.webp', 'textures/WEBP/BUMP.webp', 0.5); // Globe 2 avec rotation moyenne
+            createGlobe('globe3', 'textures/WEBP/EARTH.webp', 'textures/WEBP/BUMP.webp', 1.0); // Globe 3 avec rotation rapide
             createGlobe('globe4', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 0.5); // Globe 4 avec rotation moyenne
         });
     </script>    
