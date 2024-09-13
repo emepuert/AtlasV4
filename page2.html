@@ -18,6 +18,7 @@
             background: linear-gradient(#000000 0%, #1a1a4e 25%, #1b6fa6 50%, #2cb5e8 75%, #8fd3f4 100%);
             font-family: Arial, sans-serif;
             overflow-x: hidden;
+            cursor: url('icon/svg/cursor.svg'), pointer;
         }
 
         /* Conteneur principal */
@@ -303,6 +304,12 @@
             animation: twinkle 2s linear infinite; /* Animation lente */
         }
 
+        .profilpic {
+            width: 10vh;
+            height: 10vh;
+            border-radius: 50%;
+        }
+
         /* Pour les écrans de taille petite (smartphones) */
         @media only screen and (max-width: 768px) {
             .div1 {
@@ -324,7 +331,7 @@
     <div class="main-container">
         <!-- Div 1 -->
         <div class="div1">
-            <div class="globe-container" id="globe1"></div>
+            <img src="textures/MOI3.webp" alt="Icon 5" class="profilpic">
             <div class="rotating-text">
                 <svg viewBox="0 0 300 300">
                     <defs>
@@ -341,10 +348,9 @@
         <div class="div2">
             <div class="content">
                 <h2 class="glitch-text">Introduction</h2>
-                <p>Hi, I'm Dawa Tran Quang-Tru, and I currently live in Nancy, France. I have Vietnamese roots and I'm 25 years old. I really love science and the environment. My family has been interested in these things for generations, so I've always been curious about them.</p>
-                <p>I'm kind of quiet but also like talking to people. I enjoy thinking about stuff on my own, but I also like having good conversations with different people.</p>
-                <p>I really enjoy trying different foods. I love the taste of Italian food and Middle Eastern dishes. Eating these foods feels like going on a journey, just like when I learn new things.</p>
-                <p>I'm good at English, so I can talk and have conversations easily. I also know a bit of Spanish, which helps me connect with more people and cultures.</p>
+                <p>Hi, I'm Dawa Tran Quang-Tru, a French citizen currently living in Nancy, France. I have Vietnamese roots and I'm 25 years old. I've always had a strong passion for science and the environment, which runs in my family. What I love most is finding creative solutions and developing new protocols in my work, constantly pushing myself to solve problems in innovative ways.</p>
+                <p>I'm more confident when working alone, but I also seek feedback from a team to improve and grow. I believe in finding a balance between independent thinking and collaboration.</p>
+                <p>I'm fluent in English, with a TOEIC score of 895, and I also know a bit of Spanish, which allows me to connect with even more people and cultures.</p>
                 <p>This portfolio is a way for me to showcase my love for science, nature, and learning. It's where my experiences and passion for solving problems come together.</p>
             </div>
         </div>
@@ -352,7 +358,7 @@
     <div class="main-container">
         <!-- Div 1 -->
         <div class="div1">
-            <div class="globe-container" id="globe2"></div>
+            <div class="globe-container" id="globe1"></div>
             <div class="rotating-text">
                 <svg viewBox="0 0 300 300">
                     <defs>
@@ -369,17 +375,22 @@
         <div class="div2">
             <div class="content">
                 <h2 class="glitch-text">Experiences</h2>
-                <p>Currently, I am working at Nord-Est Géo Environnement (NEGE), a consultancy firm founded in 2011. Since October 2022, I have been involved in various projects related to urban planning, territorial diagnostics, and environmental studies.</p>
-                <p>My role includes:</p>
+                <p>I worked at Nord-Est Géo Environnement (NEGE), a consultancy firm founded in 2011, for two years as an apprentice. During my time there, I was involved in various projects related to urban planning, territorial diagnostics, and environmental studies. I gained valuable field experience and used these two years to develop and optimize technical solutions to address challenges we encountered.</p>
+                <p>My role included:</p> 
                 <ul>
-                    <li><img src="icon/svg/document.svg" alt="Image" />Creation of urban planning documents</li>
-                    <li><img src="icon/svg/enquete.svg" alt="Image" />Territory diagnostics</li>
-                    <li><img src="icon/svg/carte.svg" alt="Image" />Creation of maps and graphic productions</li>
-                    <li><img src="icon/svg/analyse.svg" alt="Image" />Data collection, processing, and analysis</li>
-                    <li><img src="icon/svg/meeting.svg" alt="Image" />Participation in public or working meetings</li>
-                    <li><img src="icon/svg/terrain.svg" alt="Image" />Field studies with officials and residents</li>
+                <li><img src="icon/svg/document.svg" alt="Image" />Creation of urban planning documents</li>
+                <li><img src="icon/svg/enquete.svg" alt="Image" />Territory diagnostics</li>
+                <li><img src="icon/svg/carte.svg" alt="Image" />Creation of maps and graphic productions</li>
+                <li><img src="icon/svg/analyse.svg" alt="Image" />Data collection, processing, and analysis</li>
+                <li><img src="icon/svg/meeting.svg" alt="Image" />Participation in public or working meetings</li>
+                <li><img src="icon/svg/terrain.svg" alt="Image" />Field studies with officials and residents</li>
                 </ul>
-                <p>Past experiences include:</p>
+                <h2 class="glitch-text">London Workshop 2024</h2>
+                <p>In April 2024, I participated in a workshop in London as part of the Master’s program in Geomatics at Cergy Pontoise. The workshop took place at Royal Holloway University in Egham and focused on flood risk due to submersion in the London area and its surroundings. During the week-long workshop, we worked on creating a scenario with responses for the short, medium, and long term. This included immediate actions during the incident, post-incident measures, and drawing conclusions to prepare for similar future events.</p>
+                <p>This experience helped me develop my English language skills and gave me insight into how other countries approach risk management and emergency response strategies.</p>
+                <h2 class="glitch-text">My Project : Mapsterpieces.com </h2>
+                <p>I also developed a custom poster e-commerce website, <a href="https://mapsterpieces.fr/" style="text-decoration: none; color: rgba(255, 255, 255, 0.75);" onmouseover="this.style.color='white';" onmouseout="this.style.color='rgba(255, 255, 255, 0.75)';">Mapsterpieces</a>, currently hosted on Shopify. The site underwent a complete redesign, which I managed entirely on my own. I had to innovate to find the right platform that suited my needs and developed it from A to Z. This project allowed me to hone my skills both as a developer and as an artist, particularly in the process of creating the design templates.</p>
+                <h2 class="glitch-text">Small Jobs </h2>
                 <ul>
                     <li><img src="icon/svg/loterr.svg" alt="Image" />Internship related to Master's 1 degree, research on the evolution of vegetable gardens in Lorraine</li>
                     <li><img src="icon/svg/chef.svg" alt="Image" />Cook at the "Le Voyou" restaurant in Nancy</li>
@@ -393,7 +404,7 @@
     <div class="main-container">
         <!-- Div 1 -->
         <div class="div1">
-            <div class="globe-container" id="globe3"></div>
+            <div class="globe-container" id="globe2"></div>
             <div class="rotating-text">
                 <svg viewBox="0 0 300 300">
                     <defs>
@@ -449,8 +460,9 @@
             this.timePerLetter = timePerLetter;
             this.maxCount = Math.floor(this.timeGlitch / this.timePerLetter);
             this.count = 0;
+            this.interval = null; // Ajout pour stocker l'intervalle
         }
-    
+
         Glitch.prototype.init = function() {
             this.innerText = this.selector.innerText;
             this.charArray = this.innerText.split("");
@@ -459,7 +471,7 @@
             }
             this.defineCharIndexToRandomize();
         }
-    
+
         Glitch.prototype.defineCharIndexToRandomize = function() {
             this.charIndex = [];
             for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
@@ -467,12 +479,10 @@
                 this.charIndex.push(randCharIndex);
             }
         }
-    
+
         Glitch.prototype.randomize = function() {
-            //copy the char array
             let randomString = Array.from(this.charArray);
-    
-            //randomize char
+
             for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
                 let randIndex = Math.floor(Math.random() * chars.length);
                 let randCharIndex = this.charIndex[i];
@@ -482,13 +492,13 @@
             }
             this.selector.innerText = randomString.join("");
         }
-    
-        Glitch.prototype.update = function(interval) {
+
+        Glitch.prototype.update = function() {
             if (this.count >= this.maxCount - 1) {
                 this.selector.innerText = this.innerText;
                 this.defineCharIndexToRandomize();
                 let ctx = this;
-                let wait = setTimeout(function() {
+                setTimeout(function() {
                     ctx.count = 0;
                 }, this.timeBetweenGlitch);
             } else {
@@ -496,16 +506,22 @@
                 this.count++;
             }
         }
-    
+
         Glitch.prototype.glitch = function() {
             let ctx = this;
-            let interval = setInterval(function() {
-                ctx.update(this);
+            this.interval = setInterval(function() {
+                ctx.update();
             }, this.timePerLetter);
+            
+            // Arrête l'effet glitch après 10 secondes
+            setTimeout(function() {
+                clearInterval(ctx.interval);
+                ctx.selector.innerText = ctx.innerText; // Réinitialise le texte
+            }, 10000); // 10 secondes
         }
-    
+
         var glitchArray = [];
-    
+
         function initGlitchText() {
             const glitchTextElements = document.querySelectorAll(".glitch-text");
             glitchTextElements.forEach((selector, i) => {
@@ -516,16 +532,17 @@
                 glitchArray.push(glitch);
             });
         }
-    
+
         function startGlitch() {
             glitchArray.forEach(glitch => {
                 glitch.glitch();
             });
         }
-    
+
         // Initialize and start the glitch effect
         initGlitchText();
         startGlitch();
+
     </script>    
     <script>
         function createStars(layerId, numStars, starSize, minTwinkleTime, maxTwinkleTime) {
@@ -608,8 +625,8 @@
         // Initialiser les globes normaux avec rotation automatique
         $(document).ready(function () {
             createGlobe('globe1', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 1.0); // Globe 1 avec rotation rapide
-            createGlobe('globe2', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 0.5); // Globe 2 avec rotation moyenne
-            createGlobe('globe3', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 1.0); // Globe 3 avec rotation rapide
+            createGlobe('globe2', 'textures/WEBP/EARTH.webp', 'textures/WEBP/BUMP.webp', 0.5); // Globe 2 avec rotation moyenne
+            createGlobe('globe3', 'textures/WEBP/EARTH.webp', 'textures/WEBP/BUMP.webp', 1.0); // Globe 3 avec rotation rapide
             createGlobe('globe4', 'textures/WEBP/MOON.webp', 'textures/WEBP/BUMP.webp', 0.5); // Globe 4 avec rotation moyenne
         });
     </script>    
