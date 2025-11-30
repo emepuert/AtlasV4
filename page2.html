@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me & Experience | Dawa Tran Portfolio</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicons/favicon-96x96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="manifest" href="favicons/site.webmanifest">
+    
+    <script src="https://unpkg.com/three@0.133.1/build/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            min-height: 100vh;
+            width: 100%;
+            background: linear-gradient(#000000 0%, #1a1a4e 50%, #2cb5e8 100%);
+            font-family: "Space Mono", monospace;
+            font-weight: 700;
+            overflow-x: hidden;
+            cursor: url('icon/svg/cursor.svg'), pointer;
+            color: white;
+        }
+
+        /* Home button */
+        .home-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 75px;
+            height: 75px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1000;
+            text-decoration: none;
+            color: white;
+            transition: color 0.3s ease;
+            font-size: x-large;
+        }
+
+        .home-button .une-forme {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .home-button .une-forme::before {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 0 rgba(139, 211, 244, 0);
+        }
+
+        .home-button:hover .une-forme::before {
+            background-color: rgba(139, 211, 244, 0.2);
+            border-color: #8fd3f4;
+            box-shadow: 0 0 30px rgba(139, 211, 244, 0.6);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .home-button:hover {
+            color: #8fd3f4;
+            text-shadow: 0 0 10px rgba(139, 211, 244, 0.8);
+        }
+
+        /* Header section */
+        .header-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 20px 50px;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid rgba(139, 211, 244, 0.6);
+            box-shadow: 0 0 30px rgba(139, 211, 244, 0.4);
+            object-fit: cover;
+            transition: all 0.05s ease;
+        }
+
+        .profile-pic.glitch {
+            filter: contrast(1.3) brightness(1.2) hue-rotate(180deg);
+            transform: scale(1.02) translateX(2px);
+            border-color: rgba(255, 0, 0, 0.8);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: scale(1.02) translateX(0); }
+            25% { transform: scale(1.02) translateX(-2px); }
+            50% { transform: scale(1.02) translateX(2px); }
+            75% { transform: scale(1.02) translateX(-2px); }
+        }
+
+        .header-title {
+            font-size: 3.5rem;
+            color: #8fd3f4;
+            text-shadow: 0 0 30px rgba(139, 211, 244, 0.6);
+            margin-bottom: 20px;
+        }
+
+        .header-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Content sections */
+        .content-section {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px;
+        }
+
+        .content-box {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 50px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            color: #8fd3f4;
+            text-shadow: 0 0 20px rgba(139, 211, 244, 0.5);
+            margin-bottom: 40px;
+            text-align: center;
+            border-bottom: 2px solid rgba(139, 211, 244, 0.3);
+            padding-bottom: 20px;
+        }
+
+        /* Variantes de couleur pour les titres */
+        .section-title.gold {
+            color: #FFD700;
+            text-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            border-bottom-color: rgba(255, 215, 0, 0.4);
+        }
+
+        .section-title.red {
+            color: #ff6b6b;
+            text-shadow: 0 0 25px rgba(255, 107, 107, 0.6);
+            border-bottom-color: rgba(255, 107, 107, 0.4);
+        }
+
+        .content-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            margin-bottom: 25px;
+        }
+
+        /* Experience blocks */
+        .experience-block {
+            margin-bottom: 50px;
+            padding: 30px;
+            background: rgba(139, 211, 244, 0.05);
+            border-left: 4px solid #8fd3f4;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .experience-block:hover {
+            background: rgba(139, 211, 244, 0.1);
+            border-left-width: 6px;
+            transform: translateX(10px);
+        }
+
+        .experience-block.gold {
+            border-left-color: #FFD700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .experience-block.gold:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .experience-block.red {
+            border-left-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.05);
+        }
+
+        .experience-block.red:hover {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .experience-title {
+            font-size: 1.8rem;
+            color: #8fd3f4;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(139, 211, 244, 0.3);
+        }
+
+        .experience-title.gold {
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .experience-title.red {
+            color: #ff6b6b;
+            text-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+        }
+
+        .experience-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .experience-list li {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 400;
+        }
+
+        .experience-list li:hover {
+            background: rgba(139, 211, 244, 0.1);
+            transform: translateX(10px);
+        }
+
+        .experience-list li i {
+            font-size: 1.5rem;
+            color: #8fd3f4;
+            margin-right: 15px;
+            min-width: 30px;
+        }
+
+        /* Education list */
+        .education-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .education-list li {
+            padding: 20px;
+            margin-bottom: 15px;
+            background: rgba(139, 211, 244, 0.05);
+            border-radius: 10px;
+            border-left: 3px solid #8fd3f4;
+            font-weight: 400;
+            transition: all 0.3s ease;
+        }
+
+        .education-list li:hover {
+            background: rgba(139, 211, 244, 0.1);
+            border-left-width: 5px;
+            transform: translateX(10px);
+        }
+
+        /* Stars */
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            background: transparent;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .star-layer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: #FFF;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            30% { opacity: 0.2; }
+            70% { opacity: 0.7; }
+        }
+
+        #stars1 .star-layer { animation: twinkle 1s linear infinite; }
+        #stars2 .star-layer { animation: twinkle 1.5s linear infinite; }
+        #stars3 .star-layer { animation: twinkle 2s linear infinite; }
+
+        /* Globe géant section */
+        .globe-geant-section {
+            position: relative;
+            height: 40vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            overflow: hidden;
+            padding-bottom: 0;
+            margin-top: 50px;
+        }
+
+        .globe-container-geant {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .clouds {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 20;
+        }
+
+        .clouds img {
+            position: absolute;
+            bottom: 0;
+            max-width: 100%;
+            animation: animate calc(20s * var(--i)) ease-in-out infinite;
+            animation-delay: calc(-5s * var(--i));
+        }
+
+        @keyframes animate {
+            0% {
+                transform: translateX(110%);
+            }
+            100% {
+                transform: translateX(-150%);
+            }
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 768px) {
+            .header-title {
+                font-size: 2.5rem;
+            }
+
+            .header-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .content-box {
+                padding: 30px 20px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .experience-title {
+                font-size: 1.5rem;
+            }
+
+            .home-button {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars1"></div>
+    <div class="stars" id="stars2"></div>
+    <div class="stars" id="stars3"></div>
+
+    <!-- Home button -->
+    <a href="index.html" class="home-button">
+        <div class="une-forme"></div>
+        <i class="fas fa-home"></i>
+    </a>
+
+    <!-- Header Section -->
+    <section class="header-section">
+        <div class="profile-container">
+            <img src="textures/MOI3.webp" alt="Profile Picture" class="profile-pic">
+        </div>
+        <h1 class="header-title glitch-text">About Me</h1>
+        <p class="header-subtitle">French Geographer & GIS Specialist | Passionate about Innovation & Problem Solving</p>
+    </section>
+
+    <!-- Introduction Section -->
+    <section class="content-section">
+        <div class="content-box">
+            <h2 class="section-title glitch-text">Introduction</h2>
+            <p class="content-text">Hi, I'm Dawa Tran Quang-Tru, a French citizen currently living in Nancy, France. I have Vietnamese roots and I'm 25 years old. I've always had a strong passion for science and the environment, which runs in my family. What I love most is finding creative solutions and developing new protocols in my work, constantly pushing myself to solve problems in innovative ways.</p>
+            <p class="content-text">I'm more confident when working alone, but I also seek feedback from a team to improve and grow. I believe in finding a balance between independent thinking and collaboration.</p>
+            <p class="content-text">I'm fluent in English, with a TOEIC score of 895, and I also know a bit of Spanish, which allows me to connect with even more people and cultures.</p>
+            <p class="content-text">This portfolio is a way for me to showcase my love for science, nature, and learning. It's where my experiences and passion for solving problems come together.</p>
+        </div>
+    </section>
+
+    <!-- Experiences Section -->
+    <section class="content-section">
+        <div class="content-box">
+            <h2 class="section-title gold glitch-text">Professional Experience</h2>
+            
+            <div class="experience-block gold">
+                <h3 class="experience-title gold glitch-text">Field Analyst at Inicio</h3>
+                <p class="content-text">I am currently working as a Field Analyst at Inicio, a French startup specializing in project origination, particularly in renewable energy. I started working with them as a freelancer in September 2024 and transitioned to a full-time position on January 1st, 2025.</p>
+                <p class="content-text">Inicio leverages an algorithm to identify potential land sites, and my role is to de-risk these sites before passing them on to the sales team who meet with clients and connect them with developers. I focus on the Italian sector, and my work is divided into two main tasks:</p>
+                <ul class="experience-list">
+                    <li><i class="fas fa-search"></i>Land research and analysis based on algorithm results</li>
+                    <li><i class="fas fa-file-alt"></i>Development of analysis methodologies and new solutions to improve quality and productivity</li>
+                </ul>
+                <p class="content-text">Earlier this year, I participated in the due diligence process when Inicio raised €4 million in funding. The startup environment has been incredible for discovering new techniques and tools, constantly expanding my skills and capabilities.</p>
+            </div>
+
+            <div class="experience-block red">
+                <h3 class="experience-title red glitch-text">Nord-Est Géo Environnement (NEGE)</h3>
+                <p class="content-text">I worked at Nord-Est Géo Environnement (NEGE), a consultancy firm founded in 2011, for two years as an apprentice. During my time there, I was involved in various projects related to urban planning, territorial diagnostics, and environmental studies. I gained valuable field experience and used these two years to develop and optimize technical solutions to address challenges we encountered.</p>
+                <ul class="experience-list">
+                    <li><i class="fas fa-file-alt"></i>Creation of urban planning documents</li>
+                    <li><i class="fas fa-clipboard-list"></i>Territory diagnostics</li>
+                    <li><i class="fas fa-map"></i>Creation of maps and graphic productions</li>
+                    <li><i class="fas fa-chart-line"></i>Data collection, processing, and analysis</li>
+                    <li><i class="fas fa-users"></i>Participation in public or working meetings</li>
+                    <li><i class="fas fa-hiking"></i>Field studies with officials and residents</li>
+                </ul>
+            </div>
+
+            <div class="experience-block">
+                <h3 class="experience-title glitch-text">London Workshop 2024</h3>
+                <p class="content-text">In April 2024, I participated in a workshop in London as part of the Master's program in Geomatics at Cergy Pontoise. The workshop took place at Royal Holloway University in Egham and focused on flood risk due to submersion in the London area and its surroundings. During the week-long workshop, we worked on creating a scenario with responses for the short, medium, and long term.</p>
+                <p class="content-text">This experience helped me develop my English language skills and gave me insight into how other countries approach risk management and emergency response strategies.</p>
+            </div>
+
+            <div class="experience-block gold">
+                <h3 class="experience-title gold glitch-text">Additional Experience</h3>
+                <ul class="experience-list">
+                    <li><i class="fas fa-seedling"></i>Internship on the evolution of vegetable gardens in Lorraine</li>
+                    <li><i class="fas fa-utensils"></i>Cook at "Le Voyou" restaurant in Nancy</li>
+                    <li><i class="fas fa-bicycle"></i>Bicycle courier</li>
+                    <li><i class="fas fa-warehouse"></i>Worker in a grain silo</li>
+                    <li><i class="fas fa-hamburger"></i>Versatile worker in a fast-food chain</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section class="content-section">
+        <div class="content-box">
+            <h2 class="section-title red glitch-text">Education</h2>
+            <p class="content-text">My educational journey has provided me with a strong foundation in scientific methods, tools, and technologies. I've gained expertise in software like QGIS, ArcGIS, Blender, and the Adobe Suite. I've also developed skills in HTML, CSS, and Python, allowing me to explore both cartography and 3D modeling.</p>
+            <ul class="education-list">
+                <li><strong>2023 - 2024:</strong> Master's in Geomatics Applied to Urban Risks, CYU Cergy-Pontoise</li>
+                <li><strong>2021 - 2023:</strong> Master's in Geography and Urban Planning, SHS Nancy</li>
+                <li><strong>2018 - 2021:</strong> Bachelor's in Geography and Urban Planning, SHS Nancy</li>
+                <li><strong>2017 - 2018:</strong> Year 1 in Physics-Chemistry and Civil Engineering, Faculty of Sciences and Technology</li>
+                <li><strong>2015 - 2017:</strong> Scientific Baccalaureate, General Polyvalent High School</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Globe Géant Section -->
+    <section class="globe-geant-section">
+        <div class="clouds">
+            <img src="clouds/cloud2.png" style="--i:1">
+            <img src="clouds/cloud2.png" style="--i:2">
+            <img src="clouds/cloud2.png" style="--i:3">
+            <img src="clouds/cloud2.png" style="--i:4">
+            <img src="clouds/cloud2.png" style="--i:5">
+        </div>
+        <div class="globe-container-geant" id="globeGeant"></div>
+    </section>
+
+    <script>
+        // Stars creation
+        function createStars(layerId, numStars, starSize, minTwinkleTime, maxTwinkleTime) {
+            const starsContainer = document.getElementById(layerId);
+            
+            for (let i = 0; i < numStars; i++) {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+
+                const starElement = document.createElement('div');
+                starElement.classList.add('star-layer');
+                starElement.style.width = `${starSize}px`;
+                starElement.style.height = `${starSize}px`;
+                starElement.style.backgroundColor = '#FFF';
+                starElement.style.position = 'absolute';
+                starElement.style.top = `${y}px`;
+                starElement.style.left = `${x}px`;
+
+                const twinkleDuration = Math.random() * (maxTwinkleTime - minTwinkleTime) + minTwinkleTime;
+                const twinkleDelay = Math.random() * twinkleDuration;
+                starElement.style.animationDuration = `${twinkleDuration}s`;
+                starElement.style.animationDelay = `${twinkleDelay}s`;
+
+                starsContainer.appendChild(starElement);
+            }
+        }
+
+        createStars('stars1', 50, 1, 0.5, 2);
+        createStars('stars2', 40, 2, 1, 3);
+        createStars('stars3', 30, 3, 1.5, 4);
+
+        // Glitch effect
+        const chars = "☺Σ×Π#-_¯—→↓↑←0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZ";
+
+        var Glitch = function(selector, index, numberOfGlitchedLetter, timeGlitch, timePerLetter, timeBetweenGlitch) {
+            this.selector = selector;
+            this.index = index;
+            this.numberOfGlitchedLetter = numberOfGlitchedLetter;
+            this.innerText;
+            this.charArray = [];
+            this.charIndex = [];
+            this.timeGlitch = timeGlitch;
+            this.timeBetweenGlitch = timeBetweenGlitch;
+            this.timePerLetter = timePerLetter;
+            this.maxCount = Math.floor(this.timeGlitch / this.timePerLetter);
+            this.count = 0;
+            this.interval = null;
+        }
+
+        Glitch.prototype.init = function() {
+            this.innerText = this.selector.innerText;
+            this.charArray = this.innerText.split("");
+            if (this.numberOfGlitchedLetter == undefined || this.numberOfGlitchedLetter > this.innerText.length) {
+                this.numberOfGlitchedLetter = this.innerText.length;
+            }
+            this.defineCharIndexToRandomize();
+        }
+
+        Glitch.prototype.defineCharIndexToRandomize = function() {
+            this.charIndex = [];
+            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
+                let randCharIndex = Math.floor(Math.random() * this.charArray.length);
+                this.charIndex.push(randCharIndex);
+            }
+        }
+
+        Glitch.prototype.randomize = function() {
+            let randomString = Array.from(this.charArray);
+
+            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
+                let randIndex = Math.floor(Math.random() * chars.length);
+                let randCharIndex = this.charIndex[i];
+                if (randomString[randCharIndex] !== ' ') {
+                    randomString[randCharIndex] = chars[randIndex];
+                }
+            }
+            this.selector.innerText = randomString.join("");
+        }
+
+        Glitch.prototype.update = function() {
+            if (this.count >= this.maxCount - 1) {
+                this.selector.innerText = this.innerText;
+                this.defineCharIndexToRandomize();
+                let ctx = this;
+                setTimeout(function() {
+                    ctx.count = 0;
+                }, this.timeBetweenGlitch);
+            } else {
+                this.randomize();
+                this.count++;
+            }
+        }
+
+        Glitch.prototype.glitch = function() {
+            let ctx = this;
+            this.interval = setInterval(function() {
+                ctx.update();
+            }, this.timePerLetter);
+        }
+
+        var glitchArray = [];
+
+        function initGlitchText() {
+            const glitchTextElements = document.querySelectorAll(".glitch-text");
+            glitchTextElements.forEach((selector, i) => {
+                let randLetterNumber = 2 + Math.floor(Math.random() * 8);
+                let randGlitchPauseTime = 500 + Math.floor(Math.random() * 2500);
+                let glitch = new Glitch(selector, i, randLetterNumber, 200, 65, randGlitchPauseTime);
+                glitch.init();
+                glitchArray.push(glitch);
+            });
+        }
+
+        function startGlitch() {
+            glitchArray.forEach(glitch => {
+                glitch.glitch();
+            });
+        }
+
+        // Initialize and start the glitch effect
+        initGlitchText();
+        startGlitch();
+
+        // Photo glitch effect
+        const profilePic = document.querySelector('.profile-pic');
+        const normalPhoto = 'textures/MOI3.webp';
+        const creepyPhoto = 'textures/MOICREEPY.webp';
+
+        // Preload creepy photo
+        const preloadCreepy = new Image();
+        preloadCreepy.src = creepyPhoto;
+
+        function glitchPhoto() {
+            // Durée du glitch (600ms pour bien voir la photo creepy)
+            const glitchDuration = 600;
+            
+            // Change to creepy photo
+            profilePic.src = creepyPhoto;
+            profilePic.classList.add('glitch');
+            
+            // Return to normal quickly
+            setTimeout(() => {
+                profilePic.src = normalPhoto;
+                profilePic.classList.remove('glitch');
+            }, glitchDuration);
+            
+            // Schedule next glitch randomly between 10-30 seconds
+            const nextGlitch = 10000 + Math.random() * 20000;
+            setTimeout(glitchPhoto, nextGlitch);
+        }
+
+        // Start the glitch effect after 5 seconds
+        setTimeout(glitchPhoto, 5000);
+    </script>
+
+    <script src="//unpkg.com/globe.gl"></script>
+    <script type="module">
+        import * as THREE from '//unpkg.com/three/build/three.module.js';
+
+        const globeGeant = Globe()
+            .globeImageUrl('textures/WEBP/HD/EARTH.webp')
+            .bumpImageUrl('textures/WEBP/HD/BUMP.webp')
+            .backgroundColor('rgba(0, 0, 0, 0)')
+            (document.getElementById('globeGeant'));
+
+        // Custom globe material
+        const globeMaterial = globeGeant.globeMaterial();
+        globeMaterial.bumpScale = 100;
+
+        const directionalLight = globeGeant.lights().find(light => light.type === 'DirectionalLight');
+        directionalLight && directionalLight.position.set(1, 1, 1);
+
+        // Scale and position the globe
+        document.getElementById('globeGeant').style.transform = 'scale(1.5) translate(-32%, -15%)';
+
+        globeGeant.controls().autoRotate = true;
+        globeGeant.controls().autoRotateSpeed = 0.5;
+
+        // Make globe responsive
+        window.addEventListener('resize', () => {
+            globeGeant.width(window.innerWidth);
+            globeGeant.height(window.innerHeight);
+        });
+    </script>
+</body>
+</html>

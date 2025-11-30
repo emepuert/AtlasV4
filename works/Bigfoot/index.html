@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <!-- Affichage responsive -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carte des signalements de Bigfoot</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" 
+    rel="stylesheet"
+  >
+
+  <style>
+    /* Palette de couleurs personnalisée */
+    :root {
+      --primary-dark: #453e2f;
+      --primary-medium: #5d8885;
+      --primary-light: #b9bd82;
+      --background-light: #e9ddc5;
+      --black: #050505;
+      --highlight: #eacf7a;
+      --accent-red: #b94c37;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    body {
+      background-color: var(--primary-medium);
+      color: var(--background-light);
+      font-family: "Poppins", serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Conteneur principal : carte (75%) + timeline (25%) */
+    #main-container {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+    }
+
+    /* La carte occupe 75% de la largeur et toute la hauteur */
+    #map {
+      width: 75%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Timeline et contrôles (25%) */
+    #timeline-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      width: 25%;
+      height: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    /* Titre en haut du panneau */
+    #timeline-container h1 {
+      margin: 0;
+      padding: 3vh;
+      width: 100%;
+      position: sticky;
+      top: 0;
+      background-color: var(--accent-red);
+      z-index: 10; 
+      color: var(--highlight);
+      text-align: center;
+    }
+
+    /* Bouton retour */
+    #back-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background-color: var(--accent-red);
+      border: 2px solid var(--highlight);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 10000;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: var(--highlight);
+      font-size: 28px;
+      font-weight: bold;
+      line-height: 1;
+      padding: 0;
+      margin: 0;
+    }
+    #back-button:hover {
+      background-color: var(--highlight);
+      color: var(--accent-red);
+      transform: scale(1.1);
+      box-shadow: 0 0 20px var(--highlight);
+    }
+
+    /* Empreintes sur la carte */
+    #footprints-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .footprint {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 2s linear;
+    }
+
+    /* Etiquette date */
+    #date-label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5vw;
+      margin-top: 5vw;
+      color: var(--highlight);
+      text-align: center;
+    }
+
+    /* Boutons timeline */
+    .timeline-buttons {
+      margin: 0;
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 10; 
+      text-align: center;
+      background-color: var(--primary-medium);
+      padding-bottom: 1rem;
+    }
+    .timeline-buttons button {
+      margin: 5px;
+      padding: 5px 10px;
+      font-size: 14px;
+      font-family: "Poppins", serif;
+      border: solid var(--accent-red);
+      color: white;
+      border-radius: 2vw;
+      background-color: var(--accent-red);
+      cursor: pointer;
+    }
+    .timeline-buttons button:hover {
+      background-color: var(--highlight);
+      border-color: var(--highlight);
+      color: var(--black);
+    }
+
+    /* Container pour le slider stylisé + walker */
+    .slider-container {
+      position: relative;
+      width: 300px; /* On gèrera la largeur dans les media queries */
+      max-width: 90%;
+      margin: 5vw 0;
+    }
+    .walker {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      top: -50px;
+      transform: translateX(-25%);
+    }
+
+    /* Slider stylisé : la barre de progression + le thumb */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 10px;
+      background: linear-gradient(to right, var(--highlight) var(--progress, 0%), #ccc var(--progress, 0%));
+      border-radius: 5px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--accent-red);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    /* Le bloc flottant des checkboxes classification (apparait/caché via JS) */
+    #classification-filters-floating {
+      position: absolute;
+      top: 70px;
+      left: 10px;
+      background: var(--primary-dark);
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      border: 2px solid var(--accent-red);
+      display: none;
+      z-index: 9999;
+      min-width: 320px;
+    }
+    #classification-filters-floating h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: var(--highlight);
+      font-size: 18px;
+      text-align: center;
+      border-bottom: 2px solid var(--accent-red);
+      padding-bottom: 10px;
+    }
+
+    /* ====== Nouvelle légende propre ====== */
+    .legend-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      gap: 12px;
+    }
+    .legend-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .legend-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--background-light);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .legend-checkbox:checked {
+      background: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+
+    .legend-checkbox:checked::after {
+      content: "✓";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--highlight);
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .legend-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .legend-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      color: var(--background-light);
+      font-size: 14px;
+    }
+
+    .legend-color-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--black);
+      flex-shrink: 0;
+    }
+
+    .legend-description {
+      font-size: 12px;
+      color: var(--background-light);
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+
+    /* Désactiver l'item quand décoché */
+    .legend-item.disabled {
+      opacity: 0.5;
+    }
+    .legend-item.disabled .legend-description {
+      opacity: 0.6;
+    }
+    /* ======================= */
+
+    /* Style perso du bouton "?" (Leaflet control) */
+    .question-button {
+      background-color: var(--accent-red) !important;
+      color: var(--highlight) !important;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      width: 32px; 
+      height: 32px;
+      line-height: 32px; /* centre verticalement le ? */
+      border: none;
+      border-radius: 4px;
+      font-size: 18px;
+    }
+    .question-button:hover {
+      background-color: var(--highlight) !important;
+      color: var(--black) !important;
+      text-decoration: none;
+    }
+
+    /* ======================= */
+    /*        RESPONSIVE       */
+    /* ======================= */
+    @media (max-width: 768px) {
+      #main-container {
+        flex-direction: column;
+      }
+      #map {
+        width: 100%;
+        height: 50vh;
+      }
+      #timeline-container {
+        width: 100%;
+        height: auto;
+      }
+      .slider-container {
+        width: 90%;
+        max-width: 400px;
+        margin: 20px auto;
+      }
+    }
+    @media (max-width: 480px) {
+      #map {
+        height: 40vh;
+      }
+      #timeline-container h1 {
+        font-size: 1.2rem;
+        padding: 1rem;
+      }
+      .timeline-buttons button {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Bouton retour à la galerie -->
+  <a id="back-button" href="../../page3.html" title="Retour à la galerie">←</a>
+
+  <div id="main-container">
+    <!-- La carte -->
+    <div id="map">
+      <div id="footprints-container"></div>
+    </div>
+
+    <!-- Panneau timeline -->
+    <div id="timeline-container">
+      <h1>Carte des signalements de Bigfoot</h1>
+
+      <label id="date-label">Date:</label>
+      <div class="slider-container">
+        <img src="images/1.svg" class="walker" id="walker" alt="Walker" />
+        <input type="range" id="timeline" min="0" max="100" value="0">
+      </div>
+      <div class="timeline-buttons">
+        <button onclick="startAutoChange(1)">⏩ Avancer</button>
+        <button onclick="startAutoChange(-1)">⏪ Reculer</button>
+        <button onclick="startAutoChange(5)">⏭️ Avancer rapide</button>
+        <button onclick="startAutoChange(-5)">⏮️ Reculer rapide</button>
+        <button onclick="pauseAutoChange()">⏸ Pause</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conteneur flottant pour les checkboxes (avec icônes) -->
+  <div id="classification-filters-floating">
+    <h3>Classification</h3>
+    <!-- checkboxes JS -->
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // ---------------------
+    // Paramètres d'animation timeline
+    // ---------------------
+    const SPEED_NORMAL = 100; // 1s
+    const SPEED_FAST = 50;    // 0.5s
+
+    // EXEMPLE de couleurs par classification (pour le style des points)
+    const classificationColors = {
+      "Class A": "#e31a1c",
+      "Class B": "#1f78b4",
+      "Class C": "#33a02c"
+    };
+
+
+    // Par défaut, tout est "true" (on affiche tout)
+    let classificationVisibility = {};
+    for (let cls in classificationColors) {
+      classificationVisibility[cls] = true;
+    }
+
+    // La carte
+    var map = L.map('map', {
+      zoomControl: false
+    }).setView([37.7749, -99.4194], 4);
+    map.keyboard.disable();
+    
+    // Empêcher que le zoom/pan interfère avec l'autoplay
+    map.on('zoomstart movestart', function() {
+      // Ne rien faire - on garde l'autoPlay en cours
+    });
+
+    // Fond de carte Stamen Terrain
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', {
+      maxZoom: 18,
+      attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Données
+    var allFeatures = [];
+    var currentLayer = L.layerGroup().addTo(map);
+    var uniqueDates = [];
+    var groupedFeatures = {};
+    var currentIndex = 0;
+    var autoPlay = null;
+
+    // Pointeur vers le bouton “?”
+    let questionButton = null;
+
+    // ----- Récupération du GeoJSON -----
+    fetch('bigfoot_corrected.geojson')
+      .then(res => res.json())
+      .then(data => {
+        allFeatures = data.features;
+        
+        // Regrouper par date
+        allFeatures.forEach(feature => {
+          if (feature.properties.date) {
+            let date = feature.properties.date;
+            if (!groupedFeatures[date]) {
+              groupedFeatures[date] = [];
+            }
+            groupedFeatures[date].push(feature);
+          }
+        });
+
+        // Trier les dates
+        uniqueDates = Object.keys(groupedFeatures).sort((a, b) => new Date(a) - new Date(b));
+
+        // Configurer le slider
+        const timeline = document.getElementById('timeline');
+        timeline.min = 0;
+        timeline.max = uniqueDates.length - 1;
+        timeline.value = 0;
+
+        // Crée le contrôle “?”
+        createQuestionMarkControl();
+        // Crée nos checkboxes (avec icônes) dans #classification-filters-floating
+        createClassificationFilters();
+
+        // Première mise à jour
+        updateMap(0);
+      })
+      .catch(err => console.error("Erreur chargement geojson:", err));
+
+    // ---------------------
+    // Contrôle Leaflet bouton “?”
+    // ---------------------
+    function createQuestionMarkControl() {
+      let questionControl = L.control({ position: 'topleft' });
+      questionControl.onAdd = function(map) {
+        let container = L.DomUtil.create('div', 'leaflet-bar'); 
+        container.style.background = 'white';
+        container.style.cursor = 'pointer';
+
+        let link = L.DomUtil.create('a', 'question-button', container);
+        link.innerHTML = '?';
+        link.href = '#';
+        link.title = 'Afficher/masquer classification';
+
+        // On stocke le bouton
+        questionButton = link;
+
+        // Empêche la propagation du clic
+        L.DomEvent.disableClickPropagation(container);
+
+        // Au clic, toggle le bloc
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleClassificationPanel();
+        });
+
+        return container;
+      };
+      questionControl.addTo(map);
+    }
+    function toggleClassificationPanel() {
+      let panel = document.getElementById('classification-filters-floating');
+      if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+      } else {
+        panel.style.display = 'none';
+      }
+    }
+
+    // ---------------------
+    // Création de la légende pour Classifications
+    // ---------------------
+    const classificationDescriptions = {
+      "Class A": "Clear visual sighting of a sasquatch at close range with good lighting conditions",
+      "Class B": "Indirect evidence (sounds, footprints, odors) without visual confirmation",
+      "Class C": "Second-hand reports or historical accounts"
+    };
+
+    function createClassificationFilters() {
+      let container = document.getElementById('classification-filters-floating');
+      container.innerHTML = '<h3>Sighting Classification</h3>';
+
+      // Pour chaque classification connue
+      Object.keys(classificationColors).forEach(cls => {
+        // Créer l'item de légende
+        let item = document.createElement('div');
+        item.className = 'legend-item';
+
+        // Checkbox
+        let checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'legend-checkbox';
+        checkbox.checked = true;
+        checkbox.id = 'cb-' + cls.replace(/\s+/g, '');
+
+        // Contenu (titre + description)
+        let content = document.createElement('div');
+        content.className = 'legend-content';
+
+        // Titre avec point de couleur
+        let title = document.createElement('div');
+        title.className = 'legend-title';
+        
+        let colorDot = document.createElement('div');
+        colorDot.className = 'legend-color-dot';
+        colorDot.style.backgroundColor = classificationColors[cls];
+        
+        let titleText = document.createElement('span');
+        titleText.textContent = cls;
+        
+        title.appendChild(colorDot);
+        title.appendChild(titleText);
+
+        // Description
+        let description = document.createElement('div');
+        description.className = 'legend-description';
+        description.textContent = classificationDescriptions[cls] || 'No description available';
+
+        content.appendChild(title);
+        content.appendChild(description);
+
+        // Assembler
+        item.appendChild(checkbox);
+        item.appendChild(content);
+
+        // Écouteur de changement
+        checkbox.addEventListener('change', function() {
+          classificationVisibility[cls] = this.checked;
+          updateMap(currentIndex);
+          
+          // Basculer l'état visuel
+          if (this.checked) {
+            item.classList.remove('disabled');
+          } else {
+            item.classList.add('disabled');
+          }
+        });
+
+        // Rendre tout l'item cliquable
+        item.addEventListener('click', function(e) {
+          if (e.target !== checkbox) {
+            checkbox.click();
+          }
+        });
+
+        container.appendChild(item);
+      });
+
+      // Empêche la propagation du clic à la carte
+      L.DomEvent.disableClickPropagation(container);
+      // On masque le panel au départ
+      container.style.display = 'none';
+    }
+
+    // ---------------------
+    // Mise à jour de la carte
+    // ---------------------
+    function getColorByClassification(cls) {
+      return classificationColors[cls] || "#999";
+    }
+
+    function updateMap(index) {
+      currentIndex = index;
+
+      let selectedDate = uniqueDates[index] || "Inconnue";
+      document.getElementById('date-label').textContent = "Date: " + selectedDate;
+
+      // Nettoyer la couche
+      currentLayer.clearLayers();
+
+      // Afficher les points de 0 jusqu'à index
+      if (index < uniqueDates.length) {
+        let visibleFeatures = [];
+        for (let i = 0; i <= index; i++) {
+          visibleFeatures = visibleFeatures.concat(groupedFeatures[uniqueDates[i]]);
+        }
+
+        // Filtrer par classification
+        visibleFeatures = visibleFeatures.filter(feature => {
+          let cls = feature.properties.classification;
+          if (!cls) return true; 
+          return classificationVisibility[cls] === true;
+        });
+
+        L.geoJSON(visibleFeatures, {
+          pointToLayer: function(feature, latlng) {
+            return L.circleMarker(latlng, {
+              radius: 6,
+              fillColor: getColorByClassification(feature.properties.classification),
+              color: "#000",
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.8
+            });
+          },
+          onEachFeature: function(feature, layer) {
+            if (feature.properties) {
+              let popupContent = `
+                <b>Classification :</b> ${feature.properties.classification || 'Inconnue'}<br>
+                <b>Lieu :</b> ${feature.properties.location || 'Inconnu'}<br>
+                <b>Date :</b> ${feature.properties.date || 'Non précisé'}<br>
+                <b>Description :</b> ${feature.properties.description || 'Aucune info'}
+              `;
+              layer.bindPopup(popupContent);
+            }
+          }
+        }).addTo(currentLayer);
+      }
+
+      // Animation du walker
+      const frames = ["images/1.svg","images/2.svg","images/3.svg","images/4.svg"];
+      let frameIndex = Math.floor(index / 2) % frames.length;
+      document.getElementById('walker').src = frames[frameIndex];
+
+      // Mise à jour du gradient sur le slider
+      const timeline = document.getElementById('timeline');
+      let percent = (index / (uniqueDates.length - 1)) * 100;
+      timeline.style.setProperty('--progress', percent + '%');
+
+      // Calcul de la position horizontale du walker
+      let sliderContainer = timeline.parentElement;
+      let sliderWidth = sliderContainer.clientWidth;
+      let walkerX = (index / (uniqueDates.length - 1)) * sliderWidth;
+      document.getElementById('walker').style.left = walkerX + 'px';
+    }
+
+    // ------ Changement automatique ------
+    function startAutoChange(step) {
+      if (autoPlay) clearInterval(autoPlay);
+      let speed = (Math.abs(step) > 1) ? SPEED_FAST : SPEED_NORMAL;
+
+      autoPlay = setInterval(() => {
+        let timeline = document.getElementById('timeline');
+        let newIndex = parseInt(timeline.value) + step;
+
+        // Borne entre 0 et uniqueDates.length - 1
+        newIndex = Math.max(0, Math.min(uniqueDates.length - 1, newIndex));
+
+        timeline.value = newIndex;
+        updateMap(newIndex);
+
+        // Si on arrive au bout, on arrête
+        if (newIndex === 0 || newIndex === uniqueDates.length - 1) {
+          clearInterval(autoPlay);
+        }
+      }, speed);
+    }
+    function pauseAutoChange() {
+      if (autoPlay) {
+        clearInterval(autoPlay);
+        autoPlay = null;
+      }
+    }
+
+    // ------ Slider manuel ------
+    let isUserInteracting = false;
+    const timelineSlider = document.getElementById('timeline');
+    
+    timelineSlider.addEventListener('mousedown', function() {
+      isUserInteracting = true;
+    });
+    
+    timelineSlider.addEventListener('touchstart', function() {
+      isUserInteracting = true;
+    });
+    
+    timelineSlider.addEventListener('input', function() {
+      // Ne pause que si c'est une interaction utilisateur, pas si c'est le zoom qui déclenche
+      if (isUserInteracting) {
+        pauseAutoChange();
+      }
+      let newIndex = parseInt(this.value);
+      updateMap(newIndex);
+    });
+    
+    timelineSlider.addEventListener('mouseup', function() {
+      isUserInteracting = false;
+    });
+    
+    timelineSlider.addEventListener('touchend', function() {
+      isUserInteracting = false;
+    });
+
+    // ------ Empreintes orientées sur la carte ------
+    const footprints = [
+      'images/leftfoot3.png',
+      'images/rightfoot3.png'
+    ];
+    let footIndex = 0;
+    const footprintsContainer = document.getElementById('footprints-container');
+    const mapEl = document.getElementById('map');
+    const footprintSize = 40;
+    const minDistance = 20;
+    const rotationOffset = 90;
+    let lastX = 0, lastY = 0;
+
+    mapEl.addEventListener('mousemove', function(e) {
+      const x = e.offsetX;
+      const y = e.offsetY;
+      const dx = x - lastX;
+      const dy = y - lastY;
+      const distance = Math.sqrt(dx*dx + dy*dy);
+      if (distance < minDistance) return;
+
+      lastX = x;
+      lastY = y;
+
+      // Alterner pied gauche/droit
+      const footprintURL = footprints[footIndex];
+      footIndex = (footIndex + 1) % footprints.length;
+
+      const footprint = document.createElement('img');
+      footprint.src = footprintURL;
+      footprint.classList.add('footprint');
+
+      // Taille
+      footprint.style.width = footprintSize + 'px';
+      footprint.style.height = footprintSize + 'px';
+
+      // Orientation
+      let angleDeg = Math.atan2(dy, dx) * (180 / Math.PI);
+      angleDeg += rotationOffset;
+      footprint.style.transform = `rotate(${angleDeg}deg)`;
+
+      // Centrer
+      footprint.style.left = (x - footprintSize / 2) + 'px';
+      footprint.style.top = (y - footprintSize / 2) + 'px';
+
+      footprintsContainer.appendChild(footprint);
+
+      // Disparition progressive
+      setTimeout(() => {
+        footprint.style.opacity = 0;
+      }, 50);
+      setTimeout(() => {
+        if (footprint.parentNode) {
+          footprint.parentNode.removeChild(footprint);
+        }
+      }, 2050);
+    });
+
+    // =========================
+    //  CLIC EXTERIEUR (pour fermer le bloc)
+    // =========================
+    document.addEventListener('click', function(e) {
+      let panel = document.getElementById('classification-filters-floating');
+      // Si le panel est ouvert
+      if (panel.style.display === 'block') {
+        // Si on clique en dehors du panel ET en dehors du bouton “?”
+        if (!panel.contains(e.target) && questionButton && !questionButton.contains(e.target)) {
+          panel.style.display = 'none';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

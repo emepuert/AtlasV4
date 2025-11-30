@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Exemple de Checkbox avec SVG locaux</title>
+
+  <style>
+    /* On masque l'input natif pour utiliser nos propres icônes */
+    .hidden-checkbox {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Par défaut, on affiche l’icône "unchecked" et on cache "checked" */
+    .icon-unchecked {
+      display: inline-block;
+    }
+    .icon-checked {
+      display: none;
+    }
+
+    /* Quand la checkbox est cochée, on inverse l’affichage */
+    .hidden-checkbox:checked + .custom-label .icon-unchecked {
+      display: none;
+    }
+    .hidden-checkbox:checked + .custom-label .icon-checked {
+      display: inline-block;
+    }
+
+    /* On donne au label un curseur cliquable et on aligne le texte et l’icône */
+    .custom-label {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px; /* Petit espace entre l’icône et le texte */
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Exemple de Checkbox avec SVG locaux</h1>
+
+  <!-- Checkbox masquée -->
+  <input
+    type="checkbox"
+    id="myCheckbox"
+    class="hidden-checkbox"
+  />
+
+  <!-- Label personnalisé : 
+       - Affiche l'icône décochée par défaut,
+       - Bascule sur l'icône cochée quand la case est activée.
+  -->
+  <label for="myCheckbox" class="custom-label">
+    <img
+      src="/images/1.svg"
+      alt="Décoché"
+      class="icon-unchecked"
+    />
+    <img
+      src="/images/2.svg"
+      alt="Coché"
+      class="icon-checked"
+    />
+    J’accepte les conditions
+  </label>
+
+</body>
+</html>

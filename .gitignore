@@ -1,0 +1,17 @@
+# Dossier temporaire à ne pas push
+works/team-building-jeu-piste-main/
+
+# Fichiers système
+.DS_Store
+.Rhistory
+Thumbs.db
+
+# Fichiers de configuration sensibles
+*.env
+*config.js
+!config.example.js
+
+# IDE
+.vscode/
+.idea/
+

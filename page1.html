@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills & Competences | Dawa Tran Portfolio</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicons/favicon-96x96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="manifest" href="favicons/site.webmanifest">
+    
+    <script src="//unpkg.com/globe.gl"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100vh;
+            width: 100vw;
+            background: linear-gradient(#000000 0%, #1a1a4e 50%, #2cb5e8 100%);
+            font-family: "Space Mono", monospace;
+            font-weight: 700;
+            overflow: hidden;
+            cursor: url('icon/svg/cursor.svg'), pointer;
+        }
+
+        /* Navigation points */
+        .nav-dots {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-dot.active {
+            background: white;
+            transform: scale(1.3);
+        }
+
+        .nav-dot:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-dot .tooltip {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-dot:hover .tooltip {
+            opacity: 1;
+        }
+
+        /* Globe container */
+        .globe-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            z-index: 1;
+            opacity: 0.4;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: blur(0px);
+        }
+        
+        .globe-container.changing {
+            opacity: 0.15;
+            filter: blur(3px);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Skills sections */
+        .skills-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(20px);
+            z-index: 2;
+        }
+
+        .skills-section.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        
+        .skills-section.leaving {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .skills-content {
+            max-width: 900px;
+            width: 90%;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .skill-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            will-change: transform, opacity;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .skills-section.active .skill-card {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Précharge le blur pour éviter le délai */
+        .skills-section {
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+        }
+        
+        .skills-section.active .skill-card:nth-child(1) { transition-delay: 0.05s; }
+        .skills-section.active .skill-card:nth-child(2) { transition-delay: 0.1s; }
+        .skills-section.active .skill-card:nth-child(3) { transition-delay: 0.15s; }
+        .skills-section.active .skill-card:nth-child(4) { transition-delay: 0.2s; }
+        .skills-section.active .skill-card:nth-child(5) { transition-delay: 0.25s; }
+        .skills-section.active .skill-card:nth-child(6) { transition-delay: 0.3s; }
+        .skills-section.active .skill-card:nth-child(7) { transition-delay: 0.35s; }
+
+        .skill-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(139, 211, 244, 0.6);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(44, 181, 232, 0.3);
+        }
+
+        .skill-card h3 {
+            color: #8fd3f4;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .skill-card .percentage {
+            color: white;
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+
+        .skill-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2cb5e8, #8fd3f4);
+            border-radius: 10px;
+            width: 0;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .skill-card.animate .skill-fill {
+            width: var(--skill-width);
+        }
+
+        .section-title {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #8fd3f4;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(139, 211, 244, 0.5);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: "Space Mono", monospace;
+            font-weight: 700;
+        }
+        
+        .skills-section.active .section-title {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0s;
+        }
+
+        /* Variantes de couleur pour les titres */
+        .section-title.gold {
+            color: #FFD700;
+            text-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+        }
+
+        .section-title.red {
+            color: #ff6b6b;
+            text-shadow: 0 0 25px rgba(255, 107, 107, 0.6);
+        }
+
+        /* Home button */
+        .blob-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 75px;
+            height: 75px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1000;
+            text-decoration: none;
+            color: white;
+            transition: color 0.3s ease;
+            font-size: x-large;
+        }
+
+        .blob-button .une-forme {
+            width: 75px;
+            height: 75px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        .blob-button .une-forme::before {
+            display: block;
+            position: absolute;
+            content: "";
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 75px;
+            height: 75px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 0 rgba(139, 211, 244, 0);
+        }
+
+        .blob-button:hover .une-forme::before {
+            background-color: rgba(139, 211, 244, 0.2);
+            border-color: #8fd3f4;
+            box-shadow: 0 0 25px rgba(139, 211, 244, 0.6);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .blob-button:hover {
+            color: #8fd3f4;
+            text-shadow: 0 0 10px rgba(139, 211, 244, 0.8);
+        }
+
+        /* Stars */
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            background: transparent;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .star-layer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: transparent;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            30% { opacity: 0.2; }
+            70% { opacity: 0.7; }
+        }
+
+        #stars1 .star-layer { animation: twinkle 1s linear infinite; }
+        #stars2 .star-layer { animation: twinkle 1.5s linear infinite; }
+        #stars3 .star-layer { animation: twinkle 2s linear infinite; }
+
+        /* Mobile responsiveness */
+        @media only screen and (max-width: 768px) {
+            .skills-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .globe-container {
+                width: 300px;
+                height: 300px;
+            }
+
+            .nav-dots {
+                right: 20px;
+            }
+
+            .blob-button {
+                width: 60px;
+                height: 60px;
+                font-size: large;
+            }
+
+            .blob-button .une-forme,
+            .blob-button .une-forme::before {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars1"></div>
+    <div class="stars" id="stars2"></div>
+    <div class="stars" id="stars3"></div>
+
+    <!-- Globe container -->
+    <div class="globe-container" id="globeViz"></div>
+
+    <!-- Navigation dots -->
+    <div class="nav-dots">
+        <div class="nav-dot active" data-section="0">
+            <span class="tooltip">IT Skills</span>
+        </div>
+        <div class="nav-dot" data-section="1">
+            <span class="tooltip">Urban Planning</span>
+        </div>
+        <div class="nav-dot" data-section="2">
+            <span class="tooltip">GIS</span>
+        </div>
+        <div class="nav-dot" data-section="3">
+            <span class="tooltip">Data Analysis</span>
+        </div>
+    </div>
+
+    <!-- IT Skills Section -->
+    <div class="skills-section active" data-section="0">
+        <div class="skills-content">
+            <h2 class="section-title glitch-text">IT Skills</h2>
+            
+            <div class="skill-card">
+                <h3>
+                    <i class="fab fa-python"></i> Python
+                    <span class="percentage">85%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 85%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fab fa-html5"></i> HTML5 / CSS
+                    <span class="percentage">90%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 90%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fab fa-js"></i> JavaScript
+                    <span class="percentage">40%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 40%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-database"></i> SQL (Postgres)
+                    <span class="percentage">60%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 60%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-palette"></i> Adobe Suite
+                    <span class="percentage">75%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 75%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fab fa-git-alt"></i> Git
+                    <span class="percentage">70%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 70%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Urban Planning Section -->
+    <div class="skills-section" data-section="1">
+        <div class="skills-content">
+            <h2 class="section-title gold glitch-text">Urban Planning</h2>
+            
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-city"></i> Urban Planning
+                    <span class="percentage">90%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 90%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-exclamation-triangle"></i> Risk Management
+                    <span class="percentage">90%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 90%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-route"></i> Mobility Management
+                    <span class="percentage">75%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 75%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-file-alt"></i> Documentation Writing
+                    <span class="percentage">90%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 90%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-leaf"></i> Sustainable Development
+                    <span class="percentage">60%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 60%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GIS Section -->
+    <div class="skills-section" data-section="2">
+        <div class="skills-content">
+            <h2 class="section-title red glitch-text">GIS</h2>
+            
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-map-marked-alt"></i> QGIS
+                    <span class="percentage">90%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 90%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-globe"></i> ArcGIS Suite
+                    <span class="percentage">85%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 85%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-camera"></i> Photogrammetry
+                    <span class="percentage">80%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 80%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-satellite"></i> LiDAR
+                    <span class="percentage">75%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 75%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-building"></i> BIM
+                    <span class="percentage">70%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 70%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Analysis Section -->
+    <div class="skills-section" data-section="3">
+        <div class="skills-content">
+            <h2 class="section-title gold glitch-text">Data Analysis</h2>
+            
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-chart-bar"></i> Infographics
+                    <span class="percentage">90%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 90%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-database"></i> Database Management
+                    <span class="percentage">85%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 85%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-spider"></i> Web Scraping
+                    <span class="percentage">80%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 80%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-map"></i> Cartography
+                    <span class="percentage">75%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 75%"></div>
+                </div>
+            </div>
+
+            <div class="skill-card">
+                <h3>
+                    <i class="fas fa-table"></i> Data Collection
+                    <span class="percentage">70%</span>
+                </h3>
+                <div class="skill-bar">
+                    <div class="skill-fill" style="--skill-width: 70%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Home button -->
+    <a href="index.html" class="blob-button" id="menu">
+        <div class="une-forme"></div>
+        <i class="fas fa-home"></i>
+    </a>
+
+    <script>
+        // Create stars
+        function createStars(layerId, numStars, starSize, minTwinkleTime, maxTwinkleTime) {
+            const starsContainer = document.getElementById(layerId);
+            
+            for (let i = 0; i < numStars; i++) {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+
+                const starElement = document.createElement('div');
+                starElement.classList.add('star-layer');
+                starElement.style.width = `${starSize}px`;
+                starElement.style.height = `${starSize}px`;
+                starElement.style.backgroundColor = '#FFF';
+                starElement.style.position = 'absolute';
+                starElement.style.top = `${y}px`;
+                starElement.style.left = `${x}px`;
+
+                const twinkleDuration = Math.random() * (maxTwinkleTime - minTwinkleTime) + minTwinkleTime;
+                const twinkleDelay = Math.random() * twinkleDuration;
+                starElement.style.animationDuration = `${twinkleDuration}s`;
+                starElement.style.animationDelay = `${twinkleDelay}s`;
+
+                starsContainer.appendChild(starElement);
+            }
+        }
+
+        createStars('stars1', 30, 1, 0.5, 2);
+        createStars('stars2', 25, 2, 1, 3);
+        createStars('stars3', 20, 3, 1.5, 4);
+
+        // Navigation system
+        const navDots = document.querySelectorAll('.nav-dot');
+        const sections = document.querySelectorAll('.skills-section');
+        const globeTextures = [
+            'textures/WEBP/IT.webp',
+            'textures/WEBP/MAPMOND.webp',
+            'textures/WEBP/EARTH.webp',
+            'textures/WEBP/DATA.webp'
+        ];
+        let currentSection = 0;
+        let world;
+        let isTransitioning = false;
+
+        // Précharger toutes les textures du globe
+        function preloadTextures() {
+            globeTextures.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+        }
+
+        // Initialize Globe.gl
+        function initGlobe() {
+            world = Globe()
+                .globeImageUrl(globeTextures[0])
+                .backgroundColor('rgba(0, 0, 0, 0)')
+                (document.getElementById('globeViz'));
+
+            const globeMaterial = world.globeMaterial();
+            globeMaterial.bumpScale = 50;
+
+            world.controls().enableZoom = false;
+            world.controls().enableRotate = false;
+            world.controls().autoRotate = true;
+            world.controls().autoRotateSpeed = 0.5;
+
+            function updateGlobeSize() {
+                const container = document.getElementById('globeViz');
+                world.width(container.offsetWidth).height(container.offsetHeight);
+            }
+
+            updateGlobeSize();
+            window.addEventListener('resize', updateGlobeSize);
+        }
+        
+        // Précharger les textures avant d'initialiser
+        preloadTextures();
+
+        // Change section
+        function changeSection(index) {
+            if (index === currentSection) return;
+
+            const globeContainer = document.getElementById('globeViz');
+            
+            // Add leaving animation to current section
+            sections[currentSection].classList.add('leaving');
+            navDots[currentSection].classList.remove('active');
+            
+            // Dim globe and speed up rotation
+            globeContainer.classList.add('changing');
+            world.controls().autoRotateSpeed = 8; // Rotation rapide
+            
+            // Remove old section after transition starts
+            setTimeout(() => {
+                sections[currentSection].classList.remove('active', 'leaving');
+                sections[currentSection].querySelectorAll('.skill-card').forEach(card => {
+                    card.classList.remove('animate');
+                });
+                
+                // Change globe texture au milieu de la rotation rapide
+                setTimeout(() => {
+                    world.globeImageUrl(globeTextures[index]);
+                }, 200);
+                
+                // Show new section
+                sections[index].classList.add('active');
+                navDots[index].classList.add('active');
+                
+                // Restore globe opacity and slow down rotation
+                setTimeout(() => {
+                    world.controls().autoRotateSpeed = 0.5; // Retour à vitesse normale
+                    setTimeout(() => {
+                        globeContainer.classList.remove('changing');
+                    }, 100);
+                }, 500);
+                
+                // Animate skill bars
+                setTimeout(() => {
+                    sections[index].querySelectorAll('.skill-card').forEach(card => {
+                        card.classList.add('animate');
+                    });
+                }, 400);
+                
+            }, 400);
+
+            currentSection = index;
+        }
+
+        // Navigation dots click
+        navDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                if (isTransitioning) return;
+                isTransitioning = true;
+                changeSection(index);
+                setTimeout(() => { isTransitioning = false; }, 1000);
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (isTransitioning) return;
+            
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                isTransitioning = true;
+                const next = (currentSection + 1) % sections.length;
+                changeSection(next);
+                setTimeout(() => { isTransitioning = false; }, 1000);
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                isTransitioning = true;
+                const prev = (currentSection - 1 + sections.length) % sections.length;
+                changeSection(prev);
+                setTimeout(() => { isTransitioning = false; }, 1000);
+            }
+        });
+
+        // Mouse wheel navigation
+        let wheelTimeout;
+        document.addEventListener('wheel', (e) => {
+            if (isTransitioning) return;
+            
+            clearTimeout(wheelTimeout);
+            wheelTimeout = setTimeout(() => {
+                isTransitioning = true;
+                if (e.deltaY > 0) {
+                    const next = (currentSection + 1) % sections.length;
+                    changeSection(next);
+                } else {
+                    const prev = (currentSection - 1 + sections.length) % sections.length;
+                    changeSection(prev);
+                }
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, 1000);
+            }, 50);
+        });
+
+        // Initialize
+        initGlobe();
+        
+        // Animate first section
+        setTimeout(() => {
+            sections[0].querySelectorAll('.skill-card').forEach(card => {
+                card.classList.add('animate');
+            });
+        }, 500);
+    </script>
+
+    <script>
+        // Glitch effect
+        const chars = "☺Σ×Π#-_¯—→↓↑←0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZ";
+
+        var Glitch = function(selector, index, numberOfGlitchedLetter, timeGlitch, timePerLetter, timeBetweenGlitch) {
+            this.selector = selector;
+            this.index = index;
+            this.numberOfGlitchedLetter = numberOfGlitchedLetter;
+            this.innerText;
+            this.charArray = [];
+            this.charIndex = [];
+            this.timeGlitch = timeGlitch;
+            this.timeBetweenGlitch = timeBetweenGlitch;
+            this.timePerLetter = timePerLetter;
+            this.maxCount = Math.floor(this.timeGlitch / this.timePerLetter);
+            this.count = 0;
+            this.interval = null;
+        }
+
+        Glitch.prototype.init = function() {
+            this.innerText = this.selector.innerText;
+            this.charArray = this.innerText.split("");
+            if (this.numberOfGlitchedLetter == undefined || this.numberOfGlitchedLetter > this.innerText.length) {
+                this.numberOfGlitchedLetter = this.innerText.length;
+            }
+            this.defineCharIndexToRandomize();
+        }
+
+        Glitch.prototype.defineCharIndexToRandomize = function() {
+            this.charIndex = [];
+            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
+                let randCharIndex = Math.floor(Math.random() * this.charArray.length);
+                this.charIndex.push(randCharIndex);
+            }
+        }
+
+        Glitch.prototype.randomize = function() {
+            let randomString = Array.from(this.charArray);
+
+            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
+                let randIndex = Math.floor(Math.random() * chars.length);
+                let randCharIndex = this.charIndex[i];
+                if (randomString[randCharIndex] !== ' ') {
+                    randomString[randCharIndex] = chars[randIndex];
+                }
+            }
+            this.selector.innerText = randomString.join("");
+        }
+
+        Glitch.prototype.update = function() {
+            if (this.count >= this.maxCount - 1) {
+                this.selector.innerText = this.innerText;
+                this.defineCharIndexToRandomize();
+                let ctx = this;
+                setTimeout(function() {
+                    ctx.count = 0;
+                }, this.timeBetweenGlitch);
+            } else {
+                this.randomize();
+                this.count++;
+            }
+        }
+
+        Glitch.prototype.glitch = function() {
+            let ctx = this;
+            this.interval = setInterval(function() {
+                ctx.update();
+            }, this.timePerLetter);
+        }
+
+        var glitchArray = [];
+
+        function initGlitchText() {
+            const glitchTextElements = document.querySelectorAll(".glitch-text");
+            glitchTextElements.forEach((selector, i) => {
+                let randLetterNumber = 2 + Math.floor(Math.random() * 8);
+                let randGlitchPauseTime = 500 + Math.floor(Math.random() * 2500);
+                let glitch = new Glitch(selector, i, randLetterNumber, 200, 65, randGlitchPauseTime);
+                glitch.init();
+                glitchArray.push(glitch);
+            });
+        }
+
+        function startGlitch() {
+            glitchArray.forEach(glitch => {
+                glitch.glitch();
+            });
+        }
+
+        // Initialize and start the glitch effect
+        initGlitchText();
+        startGlitch();
+    </script>
+</body>
+</html>
