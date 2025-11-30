@@ -414,6 +414,12 @@
         }
 
         @media only screen and (max-width: 768px) {
+            /* Enable smooth scrolling on mobile */
+            body, html {
+                -webkit-overflow-scrolling: touch;
+                touch-action: pan-y; /* Allow vertical scroll */
+            }
+            
             /* Cercle moderne mobile */
             .une-forme {
                 width: 100px;
@@ -449,7 +455,8 @@
 
             .scroll-arrow {
                 display: flex;
-                right: 20px;
+                left: 20px; /* À gauche sur mobile pour être plus pratique */
+                right: auto;
                 width: 40px;
                 height: 40px;
             }

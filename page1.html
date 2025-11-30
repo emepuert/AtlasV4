@@ -29,8 +29,17 @@
             background: linear-gradient(#000000 0%, #1a1a4e 50%, #2cb5e8 100%);
             font-family: "Space Mono", monospace;
             font-weight: 700;
-            overflow: hidden;
+            overflow: hidden; /* Desktop only */
             cursor: url('icon/svg/cursor.svg'), pointer;
+        }
+        
+        /* Enable scroll on mobile */
+        @media only screen and (max-width: 768px) {
+            body, html {
+                overflow-y: auto;
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            }
         }
 
         /* Navigation points */

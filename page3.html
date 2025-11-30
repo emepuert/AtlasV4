@@ -520,11 +520,12 @@
         }
 
         .lightbox-close {
-            position: absolute;
+            position: fixed; /* Fixed pour qu'il reste toujours visible en haut */
             top: 30px;
             right: 30px;
             font-size: 3rem;
             color: white;
+            z-index: 10001; /* Au-dessus de tout le contenu du lightbox */
             cursor: pointer;
             transition: all 0.3s ease;
             width: 50px;
@@ -596,9 +597,17 @@
             }
 
             .lightbox-close {
-                top: 20px;
-                right: 20px;
-                font-size: 2rem;
+                top: 15px;
+                right: 15px;
+                font-size: 2.5rem;
+                z-index: 10001; /* S'assurer qu'il est au-dessus sur mobile aussi */
+                background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent pour plus de visibilité */
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
     </style>
