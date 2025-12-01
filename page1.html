@@ -349,19 +349,50 @@
 
         /* Mobile responsiveness */
         @media only screen and (max-width: 768px) {
+            /* Enable natural scrolling on mobile */
+            .skills-section {
+                position: relative !important; /* Override fixed positioning */
+                opacity: 1 !important; /* Always visible */
+                pointer-events: auto !important;
+                transform: none !important;
+                height: 100vh; /* Each section takes full height */
+                min-height: 100vh;
+                display: flex !important;
+                scroll-snap-align: start; /* Snap to sections when scrolling */
+            }
+            
+            body {
+                scroll-snap-type: y mandatory; /* Enable scroll snapping */
+            }
+            
+            /* Globe stays fixed in background */
+            .globe-container {
+                position: fixed !important;
+                width: 300px;
+                height: 300px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 0; /* Behind content */
+            }
+            
             .skills-content {
                 grid-template-columns: 1fr;
                 gap: 15px;
                 padding: 20px;
+                z-index: 2; /* Above globe */
+                position: relative;
             }
 
             .section-title {
                 font-size: 1.8rem;
+                opacity: 1 !important;
+                transform: none !important;
             }
-
-            .globe-container {
-                width: 300px;
-                height: 300px;
+            
+            .skill-card {
+                opacity: 1 !important;
+                transform: none !important;
             }
 
             .nav-dots {
@@ -693,6 +724,9 @@
         let currentSection = 0;
         let world;
         let isTransitioning = false;
+        
+        // Detect if mobile
+        const isMobile = window.innerWidth <= 768;
 
         // Précharger toutes les textures du globe
         function preloadTextures() {
@@ -733,6 +767,21 @@
         function changeSection(index) {
             if (index === currentSection) return;
 
+            // On mobile, use native scroll
+            if (isMobile) {
+                sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                navDots[currentSection].classList.remove('active');
+                navDots[index].classList.add('active');
+                currentSection = index;
+                
+                // Change globe texture on mobile too
+                if (world) {
+                    world.globeImageUrl(globeTextures[index]);
+                }
+                return;
+            }
+
+            // Desktop: use transitions
             const globeContainer = document.getElementById('globeViz');
             
             // Add leaving animation to current section
@@ -789,53 +838,94 @@
             });
         });
 
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (isTransitioning) return;
-            
-            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                isTransitioning = true;
-                const next = (currentSection + 1) % sections.length;
-                changeSection(next);
-                setTimeout(() => { isTransitioning = false; }, 1000);
-            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                isTransitioning = true;
-                const prev = (currentSection - 1 + sections.length) % sections.length;
-                changeSection(prev);
-                setTimeout(() => { isTransitioning = false; }, 1000);
-            }
-        });
-
-        // Mouse wheel navigation
-        let wheelTimeout;
-        document.addEventListener('wheel', (e) => {
-            if (isTransitioning) return;
-            
-            clearTimeout(wheelTimeout);
-            wheelTimeout = setTimeout(() => {
-                isTransitioning = true;
-                if (e.deltaY > 0) {
+        // Keyboard navigation (desktop only)
+        if (!isMobile) {
+            document.addEventListener('keydown', (e) => {
+                if (isTransitioning) return;
+                
+                if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                    isTransitioning = true;
                     const next = (currentSection + 1) % sections.length;
                     changeSection(next);
-                } else {
+                    setTimeout(() => { isTransitioning = false; }, 1000);
+                } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                    isTransitioning = true;
                     const prev = (currentSection - 1 + sections.length) % sections.length;
                     changeSection(prev);
+                    setTimeout(() => { isTransitioning = false; }, 1000);
                 }
-                setTimeout(() => {
-                    isTransitioning = false;
-                }, 1000);
-            }, 50);
-        });
+            });
+
+            // Mouse wheel navigation (desktop only)
+            let wheelTimeout;
+            document.addEventListener('wheel', (e) => {
+                if (isTransitioning) return;
+                
+                clearTimeout(wheelTimeout);
+                wheelTimeout = setTimeout(() => {
+                    isTransitioning = true;
+                    if (e.deltaY > 0) {
+                        const next = (currentSection + 1) % sections.length;
+                        changeSection(next);
+                    } else {
+                        const prev = (currentSection - 1 + sections.length) % sections.length;
+                        changeSection(prev);
+                    }
+                    setTimeout(() => {
+                        isTransitioning = false;
+                    }, 1000);
+                }, 50);
+            });
+        } else {
+            // Mobile: track scroll position to update nav dots
+            const observerOptions = {
+                root: null,
+                threshold: 0.5 // Section is considered active when 50% visible
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const index = Array.from(sections).indexOf(entry.target);
+                        if (index !== -1 && index !== currentSection) {
+                            navDots[currentSection].classList.remove('active');
+                            currentSection = index;
+                            navDots[currentSection].classList.add('active');
+                            
+                            // Change globe texture when scrolling into view
+                            if (world) {
+                                world.globeImageUrl(globeTextures[index]);
+                            }
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all sections
+            sections.forEach(section => observer.observe(section));
+        }
 
         // Initialize
         initGlobe();
         
-        // Animate first section
-        setTimeout(() => {
-            sections[0].querySelectorAll('.skill-card').forEach(card => {
-                card.classList.add('animate');
-            });
-        }, 500);
+        // Animate sections
+        if (isMobile) {
+            // On mobile, animate all sections immediately since they're all visible when scrolling
+            setTimeout(() => {
+                sections.forEach(section => {
+                    section.querySelectorAll('.skill-card').forEach(card => {
+                        card.classList.add('animate');
+                    });
+                });
+            }, 500);
+        } else {
+            // On desktop, only animate first section
+            setTimeout(() => {
+                sections[0].querySelectorAll('.skill-card').forEach(card => {
+                    card.classList.add('animate');
+                });
+            }, 500);
+        }
     </script>
 
     <script>
