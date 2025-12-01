@@ -436,7 +436,7 @@
       zoomControl: false
     }).setView([37.7749, -99.4194], 4);
     map.keyboard.disable();
-    
+
     // Empêcher que le zoom/pan interfère avec l'autoplay
     map.on('zoomstart movestart', function() {
       // Ne rien faire - on garde l'autoPlay en cours
@@ -736,7 +736,7 @@
     timelineSlider.addEventListener('input', function() {
       // Ne pause que si c'est une interaction utilisateur, pas si c'est le zoom qui déclenche
       if (isUserInteracting) {
-        pauseAutoChange();
+      pauseAutoChange();
       }
       let newIndex = parseInt(this.value);
       updateMap(newIndex);
