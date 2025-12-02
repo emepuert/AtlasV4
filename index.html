@@ -15,26 +15,23 @@
     <script src="//unpkg.com/globe.gl"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body, html { 
-            margin: 0; 
-            padding: 0; 
-            height: 400vh; /* Réduit pour améliorer les performances */
+            height: 100vh;
+            width: 100vw;
             background: #000000;
             font-family: "Space Mono", monospace;
             font-weight: 700;
-            overflow-x: hidden;
-            overflow-y: scroll; /* Assure le défilement vertical sur mobile */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* Internet Explorer 10+ */
+            overflow: hidden;
             cursor: url('icon/svg/cursor.svg'), pointer;
         }
-
-        body::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
-        }
-
 
         #globeViz {
             width: 100vw; 
@@ -45,212 +42,15 @@
             z-index: 1;
         }
 
-        .image-svg-container {
-            width: 10vw; /* Largeur proportionnelle à la largeur de la fenêtre */
-            height: 10vw;
-            position: fixed;
-            z-index: 2;
-            opacity: 0; /* Masqué par défaut */
-            transition: opacity 0.5s ease-in-out; /* Transition pour l'effet d'apparition */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .image-svg {
-            fill: rgb(255, 255, 255); /* Couleur du SVG initiale */
-            width: 25%;
-            transition: fill 0.3s ease; /* Transition pour changer la couleur au survol */
-        }
-
-        /* Cercle moderne sous l'icône */
-        .une-forme {
-            width: 180px;
-            height: 180px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: -1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .une-forme::before {
-            display: block;
-            position: absolute;
-            content: "";
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 180px;
-            height: 180px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 0 rgba(139, 211, 244, 0);
-        }
-
-        /* Changement au survol */
-        .image-svg-container:hover .une-forme::before {
-            background-color: rgba(139, 211, 244, 0.15);
-            border-color: #8fd3f4;
-            box-shadow: 0 0 30px rgba(139, 211, 244, 0.6), 
-                        0 0 60px rgba(139, 211, 244, 0.3),
-                        inset 0 0 20px rgba(139, 211, 244, 0.2);
-            transform: translate(-50%, -50%) scale(1.05);
-        }
-
-        .image-svg-container:hover .image-svg {
-            fill: #8fd3f4;
-            transition: fill 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .image-svg-container:hover .rotating-text p {
-            color: #8fd3f4;
-            text-shadow: 0 0 10px rgba(139, 211, 244, 0.5);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .image-svg-container:hover .une-forme #text {
-            color: #8fd3f4;
-            text-shadow: 0 0 10px rgba(139, 211, 244, 0.5);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Texte tournant autour du SVG */
-        .rotating-text {
-            position: absolute;
-            width: 80%;
-            height: 80%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none; /* Empêche le texte de capturer les clics */
-            opacity: 1; /* Le texte est visible dès que le conteneur apparaît */
-            transition: opacity 0.3s ease;
-            text-align: center;
-        }
-
-        #text {
-            color: white;
-            font-size: 3vh; /* Utilisation de vw pour une taille de texte responsive */
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        #svg1 { top: 5%; left: 50%; transform: translate(-50%, 0); } /* En haut, centré horizontalement */
-        #svg2 { top: 50%; right: 3%; transform: translate(0, -50%); } /* À droite, centré verticalement */
-        #svg3 { bottom: 5%; left: 50%; transform: translate(-50%, 0); } /* En bas, centré horizontalement */
-        #svg4 { top: 50%; left: 5%; transform: translate(0, -50%); } /* À gauche, centré verticalement */
-
-        #svg4 .une-forme::before {
-            border-color: rgba(255, 100, 100, 0.4);
-            background-color: rgba(255, 100, 100, 0.05);
-        }
-
-        #svg4 .rotating-text p {
-            color: #ff6b6b;
-            transition: color 0.4s ease;
-        }
-
-        #svg4 .image-svg {
-            color: #ff6b6b !important;
-            fill: #ff6b6b;
-        }
-
-        #svg4:hover .une-forme::before {
-            background-color: rgba(255, 100, 100, 0.2);
-            border-color: #ff6b6b;
-            box-shadow: 0 0 30px rgba(255, 100, 100, 0.6), 
-                        0 0 60px rgba(255, 100, 100, 0.3),
-                        inset 0 0 20px rgba(255, 100, 100, 0.2);
-            transform: translate(-50%, -50%) scale(1.05);
-        }
-
-        #svg4:hover .image-svg {
-            fill: #ff6b6b;
-            filter: brightness(1.3);
-        }
-        
-        #svg4:hover .rotating-text p {
-            color: #ff6b6b;
-            text-shadow: 0 0 10px rgba(255, 100, 100, 0.8);
-        }
-        
-        #svg4:hover .une-forme #text {
-            color: #ff6b6b;
-            text-shadow: 0 0 10px rgba(255, 100, 100, 0.8);
-        }
-        
-        /* Styles pour le bouton de défilement */
-        .scroll-btn {
-            display: block;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            z-index: 3;
-            opacity: 1;
-            transition: opacity 0.5s ease;
-        }
-        .scroll-btn p {
-            color: white;
-            text-decoration: none;
-        }
-        .scroll-btn .mouse {
-            position: relative;
-            display: block;
-            width: 35px;
-            height: 55px;
-            margin: 0 auto 20px;
-            box-sizing: border-box;
-            border: 3px solid white;
-            border-radius: 23px;
-        }
-        .scroll-btn .mouse > * {
-            position: absolute;
-            display: block;
-            top: 29%;
-            left: 50%;
-            width: 8px;
-            height: 8px;
-            margin: -4px 0 0 -4px;
-            background: white;
-            border-radius: 50%;
-            animation: ani-mouse 2.5s linear infinite;
-        }
-
-        /* Ajout de l'animation */
-        @keyframes ani-mouse {
-            0% {
-                top: 29%;
-                opacity: 1;
-            }
-            50% {
-                top: 70%;
-                opacity: 0.5;
-            }
-            100% {
-                top: 29%;
-                opacity: 1;
-            }
-        }
-
+        /* Stars Background */
         .stars {
             position: fixed;
             width: 100%;
-            height: 100vh; /* Toujours 100% de la hauteur de la fenêtre */
+            height: 100vh;
             top: 0;
             left: 0;
             background: transparent;
-            z-index: 0; /* Assurez-vous que les étoiles sont derrière les autres éléments */
+            z-index: 0;
             overflow: hidden;
         }
 
@@ -261,101 +61,323 @@
             background: transparent;
         }
 
-        /* Animation scintillante plus rapide */
         @keyframes twinkle {
-            0%, 100% {
-                opacity: 1;
-            }
-            30% {
-                opacity: 0.2; /* Opacité plus faible pour un effet plus visible */
-            }
-            70% {
-                opacity: 0.7;
-            }
+            0%, 100% { opacity: 1; }
+            30% { opacity: 0.2; }
+            70% { opacity: 0.7; }
         }
 
-        /* Appliquer des animations de scintillement à différentes vitesses */
-        #stars1 .star-layer {
-            animation: twinkle 1s linear infinite; /* Animation rapide */
-        }
+        #stars1 .star-layer { animation: twinkle 1s linear infinite; }
+        #stars2 .star-layer { animation: twinkle 1.5s linear infinite; }
+        #stars3 .star-layer { animation: twinkle 2s linear infinite; }
 
-        #stars2 .star-layer {
-            animation: twinkle 1.5s linear infinite; /* Animation modérée */
-        }
-
-        #stars3 .star-layer {
-            animation: twinkle 2s linear infinite; /* Animation lente */
-        }
-
-        .scroll-arrow {
-            position: fixed;
-            right: 50px;
-            z-index: 3;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* ========== MAP MARKERS ========== */
+        .map-marker {
             cursor: pointer;
+            pointer-events: auto;
+            transition: opacity 0.25s ease;
         }
 
-        .scroll-arrow i {
-            color: white;
-            font-size: 1.2em;
-            position: relative;
-            z-index: 1;
+        /* Le pin marker (toujours visible) */
+        .marker-pin {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .marker-pin svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
             transition: all 0.3s ease;
         }
 
-        /* Cercle moderne autour des flèches */
-        .scroll-arrow .une-forme {
-            width: 45px;
-            height: 45px;
+        /* Pulsing effect on marker */
+        .marker-pin::before {
+            content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0;
+            animation: markerPulse 2s ease-out infinite;
         }
 
-        .scroll-arrow .une-forme::before {
-            display: block;
+        @keyframes markerPulse {
+            0% { transform: scale(0.5); opacity: 0.4; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        /* Le popup qui apparaît au hover */
+        .marker-popup {
             position: absolute;
-            content: "";
+            bottom: 100%;
             left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 45px;
-            height: 45px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        .marker-popup-content {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .marker-popup-icon {
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(139, 211, 244, 0.2);
+            border: 1px solid rgba(139, 211, 244, 0.4);
+        }
+
+        .marker-popup-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: #8fd3f4;
+        }
+
+        .marker-popup-label {
+            font-family: "Space Mono", monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .marker-popup-arrow {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(0, 0, 0, 0.85);
+        }
+
+        /* Hover state - show popup */
+        .map-marker:hover .marker-popup {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        .map-marker:hover .marker-pin {
+            transform: scale(1.3);
+        }
+
+        .map-marker:hover .marker-pin svg {
+            filter: drop-shadow(0 0 15px currentColor);
+        }
+
+        /* Color themes */
+        .map-marker.blue { color: #8fd3f4; }
+        .map-marker.red { color: #ff6b6b; }
+
+        .map-marker.red .marker-popup-icon {
+            background: rgba(255, 100, 100, 0.2);
+            border-color: rgba(255, 100, 100, 0.4);
+        }
+
+        .map-marker.red .marker-popup-icon svg {
+            fill: #ff6b6b;
+        }
+
+        .map-marker.red .marker-popup-content {
+            border-color: rgba(255, 100, 100, 0.3);
+        }
+
+        /* Center text */
+        .center-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            animation: fadeInCenter 1s ease 0.5s forwards;
+        }
+
+        @keyframes fadeInCenter {
+            to { opacity: 1; }
+        }
+
+        .center-text h1 {
+            color: white;
+            font-size: 1.8rem;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(139, 211, 244, 0.5), 0 0 60px rgba(0,0,0,0.8);
+        }
+
+        .center-text p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        /* ========== NAVIGATION CONTROLS ========== */
+        .nav-controls {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 0 rgba(139, 211, 244, 0);
         }
 
-        /* Effet au survol */
-        .scroll-arrow:hover .une-forme::before {
-            background-color: rgba(139, 211, 244, 0.2);
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
             border-color: #8fd3f4;
-            box-shadow: 0 0 20px rgba(139, 211, 244, 0.5);
-            transform: translate(-50%, -50%) scale(1.1);
+            background: rgba(139, 211, 244, 0.2);
+            box-shadow: 0 0 20px rgba(139, 211, 244, 0.4);
+            transform: scale(1.1);
         }
-        
-        .scroll-arrow:hover i {
+
+        .nav-btn:hover svg {
+            fill: #8fd3f4;
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        .nav-current {
+            min-width: 180px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-current:hover {
+            border-color: #8fd3f4;
+            background: rgba(139, 211, 244, 0.15);
+            box-shadow: 0 0 30px rgba(139, 211, 244, 0.3);
+        }
+
+        .nav-current.special {
+            border-color: rgba(255, 100, 100, 0.4);
+        }
+
+        .nav-current.special:hover {
+            border-color: #ff6b6b;
+            background: rgba(255, 100, 100, 0.15);
+            box-shadow: 0 0 30px rgba(255, 100, 100, 0.3);
+        }
+
+        .nav-label {
+            display: block;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-current:hover .nav-label {
             color: #8fd3f4;
-            text-shadow: 0 0 10px rgba(139, 211, 244, 0.8);
         }
 
-        /* Position des flèches l'une au-dessus de l'autre */
-        .scroll-arrow-up {
-            bottom: 80px;
+        .nav-current.special .nav-label {
+            color: #ff6b6b;
         }
 
-        .scroll-arrow-down {
-            bottom: 20px;
+        .nav-hint {
+            display: block;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Dots indicator */
+        .nav-dots {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-dot:hover {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .nav-dot.active {
+            background: #8fd3f4;
+            box-shadow: 0 0 10px rgba(139, 211, 244, 0.6);
+            transform: scale(1.3);
+        }
+
+        .nav-dot.special.active {
+            background: #ff6b6b;
+            box-shadow: 0 0 10px rgba(255, 100, 100, 0.6);
         }
 
         /* Pop-up Overlay */
@@ -366,7 +388,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.85);
             z-index: 100;
             justify-content: center;
             align-items: center;
@@ -374,104 +396,135 @@
             transition: opacity 0.3s ease;
         }
 
-        /* Pop-up Content */
         .popup-content {
-            padding: 20px;
-            border-radius: 10px;
+            padding: 50px 70px;
+            border-radius: 15px;
             text-align: center;
             position: relative;
-            transform: scale(0.7); /* Réduit la taille initialement */
-            transition: transform 0.3s ease; /* Transition pour l'agrandissement */
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px); /* Ajoutez cette ligne pour iOS */
+            transform: scale(0.7);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             color: white;
-            background-color: none;
-            border: solid 1px white;
+            background: rgba(255, 100, 100, 0.1);
+            border: 1px solid rgba(255, 100, 100, 0.4);
         }
 
-        /* Close Button */
+        .popup-content h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+        }
+
+        .popup-content p {
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 2px;
+        }
+
         .close {
             position: absolute;
-            top: 10px;
+            top: 15px;
             right: 20px;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
-            color: white;
+            color: rgba(255,255,255,0.6);
+            transition: all 0.3s ease;
         }
 
         .close:hover {
-            color: red;
+            color: #ff6b6b;
+            transform: rotate(90deg);
         }
 
-        /* Classe pour afficher le pop-up */
         .popup-overlay.show {
             display: flex;
-            opacity: 1; /* Augmentation progressive de l'opacité */
+            opacity: 1;
         }
 
         .popup-overlay.show .popup-content {
-            transform: scale(1); /* L'effet smooth lors de l'apparition */
+            transform: scale(1);
         }
 
+        /* ========== RESPONSIVE ========== */
         @media only screen and (max-width: 768px) {
-            /* Enable smooth scrolling on mobile */
-            body, html {
-                -webkit-overflow-scrolling: touch;
-                touch-action: pan-y; /* Allow vertical scroll */
-            }
-            
-            /* Cercle moderne mobile */
-            .une-forme {
-                width: 100px;
-                height: 100px;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                z-index: -1;
+            .marker-pin {
+                width: 18px;
+                height: 18px;
             }
 
-            .une-forme::before {
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                width: 125px;
-                height: 125px;
-            }
-            #svg1 { top: 8%; left: 50%; transform: translate(-50%, 0); } /* En haut, centré horizontalement */
-            #svg2 { top: 50%; right: 12%; transform: translate(0, -50%); } /* À droite, centré verticalement */
-            #svg3 { bottom: 8%; left: 50%; transform: translate(-50%, 0); } /* En bas, centré horizontalement */
-            #svg4 { top: 50%; left: 15%; transform: translate(0, -50%); } /* À gauche, centré verticalement */
-
-            #text {
-                color: white;
-                font-size: 1.5vh !important; /* Utilisation de vw pour une taille de texte responsive */
-                font-weight: 700;
-                text-transform: uppercase;
-            }
-            .scroll-btn {
-                display: none; /* Masquer le bouton sur mobile */
+            .marker-popup-content {
+                padding: 8px 12px;
+                gap: 6px;
             }
 
-            .scroll-arrow {
-                display: flex;
-                left: 20px; /* À gauche sur mobile pour être plus pratique */
-                right: auto;
-                width: 40px;
-                height: 40px;
+            .marker-popup-icon {
+                width: 24px;
+                height: 24px;
             }
-            
-            .scroll-arrow .une-forme,
-            .scroll-arrow .une-forme::before {
-                width: 40px;
-                height: 40px;
+
+            .marker-popup-icon svg {
+                width: 12px;
+                height: 12px;
             }
-            
-            .scroll-arrow-up {
-                bottom: 70px;
-            } 
+
+            .marker-popup-label {
+                font-size: 0.6rem;
+                letter-spacing: 1px;
+            }
+
+            .center-text h1 {
+                font-size: 1.2rem;
+                letter-spacing: 5px;
+            }
+
+            .center-text p {
+                font-size: 0.6rem;
+                letter-spacing: 2px;
+            }
+
+            /* Navigation controls mobile */
+            .nav-controls {
+                bottom: 100px;
+                gap: 10px;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+            }
+
+            .nav-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .nav-current {
+                min-width: 140px;
+                padding: 12px 18px;
+            }
+
+            .nav-label {
+                font-size: 0.75rem;
+                letter-spacing: 1px;
+            }
+
+            .nav-hint {
+                font-size: 0.55rem;
+            }
+
+            .nav-dots {
+                bottom: 60px;
+                gap: 10px;
+            }
+
+            .nav-dot {
+                width: 10px;
+                height: 10px;
+            }
         }
-        /* Loader screen */
+
+        /* ========== LOADER ========== */
         .loader-screen {
             position: fixed;
             top: 0;
@@ -485,7 +538,7 @@
             align-items: center;
             z-index: 99999;
             transition: opacity 0.8s ease, visibility 0.8s ease;
-            } 
+        } 
 
         .loader-screen.hidden {
             opacity: 0;
@@ -515,7 +568,6 @@
             50% { transform: translateY(-10px); }
         }
 
-        /* Globe base */
         .globe-loader {
             width: 90px;
             height: 90px;
@@ -535,7 +587,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Continents stylisés */
         .globe-loader::before,
         .globe-loader::after {
             content: '';
@@ -567,7 +618,6 @@
             50% { opacity: 0.6; transform: scale(1.05); }
         }
 
-        /* Continent supplémentaire */
         .continent {
             position: absolute;
             background: rgba(139, 211, 244, 0.25);
@@ -598,7 +648,6 @@
             border-radius: 60% 40% 50% 50%;
         }
 
-        /* Étoiles autour du globe */
         .loader-stars {
             position: absolute;
             width: 3px;
@@ -614,29 +663,10 @@
             50% { opacity: 1; transform: scale(1.5); }
         }
 
-        .loader-stars:nth-child(2) {
-            top: 5px;
-            left: 20px;
-            animation-delay: 0s;
-        }
-
-        .loader-stars:nth-child(3) {
-            top: 25px;
-            right: 10px;
-            animation-delay: 0.5s;
-        }
-
-        .loader-stars:nth-child(4) {
-            bottom: 20px;
-            left: 5px;
-            animation-delay: 1s;
-        }
-
-        .loader-stars:nth-child(5) {
-            bottom: 10px;
-            right: 18px;
-            animation-delay: 1.5s;
-        }
+        .loader-stars:nth-child(2) { top: 5px; left: 20px; animation-delay: 0s; }
+        .loader-stars:nth-child(3) { top: 25px; right: 10px; animation-delay: 0.5s; }
+        .loader-stars:nth-child(4) { bottom: 20px; left: 5px; animation-delay: 1s; }
+        .loader-stars:nth-child(5) { bottom: 10px; right: 18px; animation-delay: 1.5s; }
 
         .loader-text {
             color: white;
@@ -693,247 +723,55 @@
         </div>
     </div>
 
-    <div id="globeViz"></div>
+    <!-- Stars Background -->
     <div class="stars" id="stars1"></div>
     <div class="stars" id="stars2"></div>
     <div class="stars" id="stars3"></div>
-    <div class="scroll-arrow scroll-arrow-up" id="scrollUp">
-        <div class="une-forme"></div>
-        <i class="fas fa-arrow-up"></i>
+
+    <!-- Globe -->
+    <div id="globeViz"></div>
+
+    <!-- Center Text -->
+    <div class="center-text">
+        <h1>Dawa Tran</h1>
+        <p>GIS Specialist & Geographer</p>
     </div>
 
-    <div class="scroll-arrow scroll-arrow-down" id="scrollDown">
-        <div class="une-forme"></div>
-        <i class="fas fa-arrow-down"></i>
+    <!-- Navigation Controls -->
+    <div class="nav-controls">
+        <button class="nav-btn nav-prev" id="navPrev">
+            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <div class="nav-current" id="navCurrent">
+            <span class="nav-label">Introduction</span>
+            <span class="nav-hint">Tap to visit</span>
+        </div>
+        <button class="nav-btn nav-next" id="navNext">
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </button>
     </div>
-    <!-- Ajout des SVG cliquables avec une animation blob et texte tournant au survol -->
-    <a href="page2.html" class="image-svg-container" id="svg1">
-        <svg class="image-svg" viewBox="0 0 24 24">
-            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
-        </svg>
-        <div class="une-forme">
-            <div class="rotating-text">
-                <p id="text">Introduction &#8226; Introduction &#8226;</p>
-            </div>
-        </div>
-    </a>
-    <a href="page1.html" class="image-svg-container" id="svg2">
-        <svg class="image-svg" viewBox="0 0 24 24">
-            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
-        </svg>
-        <div class="une-forme">
-            <div class="rotating-text">
-                <p id="text">Competences &#8226; Competences &#8226;</p>
-            </div>
-        </div>
-    </a>
-    <a href="page3.html" class="image-svg-container" id="svg3">
-        <svg class="image-svg" viewBox="0 0 24 24">
-            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
-        </svg>
-        <div class="une-forme">
-            <div class="rotating-text">
-                <p id="text">Work Gallery &#8226; Work Gallery &#8226;</p>
-            </div>
-        </div>
-    </a>
-    <a href="page4.html" class="image-svg-container" id="svg4">
-        <svg class="image-svg" viewBox="0 0 24 24">
-            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
-        </svg>
-        <div class="une-forme">
-            <div class="rotating-text">
-                <p id="text">Mapsterpieces.com &#8226; Mapsterpieces.com &#8226;</p>
-            </div>
-        </div>
-    </a>
 
-    <!-- Animation de défilement -->
-    <span class="scroll-btn" id="scrollBtn">
-        <a href="#">
-            <span class="mouse">
-                <span></span>
-            </span>
-        </a>
-        <p>scroll me</p>
-    </span>
+    <!-- Dots indicator -->
+    <div class="nav-dots" id="navDots">
+        <span class="nav-dot active"></span>
+        <span class="nav-dot"></span>
+        <span class="nav-dot"></span>
+        <span class="nav-dot special"></span>
+    </div>
 
-    <a href="index.html" class="image-svg-container" id="blobButton">
-        <svg class="image-svg" viewBox="0 0 24 24">
-            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
-        </svg>
-        <div class="une-forme">
-            <div class="rotating-text">
-                <p id="text">Retour à l'accueil</p>
-            </div>
-        </div>
-    </a>
-
+    <!-- Popup -->
     <div id="popup" class="popup-overlay">
         <div class="popup-content">
             <span id="closePopup" class="close">&times;</span>
-            <h2 class="glitch-text-maj" data-text="Mapsterpieces.com">Mapsterpieces.com</h2>
-            <p class="glitch-text" data-text="Bienvenue sur Cartotech.com !">Not Available Now !</p>
+            <h2>Mapsterpieces.com</h2>
+            <p>Coming Soon!</p>
         </div>
     </div>    
     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/circletype@2.3.0/dist/circletype.min.js"></script>
+    
     <script>
-        // Positions cibles pour chaque SVG (au centre de leur zone de visibilité)
-        const svgPositions = [0.2, 0.4, 0.6, 0.8]; // Centre de chaque zone
-        
-        function getCurrentSection() {
-            const scrollPosition = window.scrollY;
-            const maxScroll = document.body.scrollHeight - window.innerHeight;
-            const scrollFraction = scrollPosition / maxScroll;
-            
-            // Trouve la section la plus proche
-            // Si on est au tout début, on est avant la section 0
-            if (scrollFraction < 0.1) return -1; // Avant la première section
-            if (scrollFraction < 0.3) return 0;  // svg1
-            if (scrollFraction < 0.5) return 1;  // svg2
-            if (scrollFraction < 0.7) return 2;  // svg3
-            if (scrollFraction < 0.9) return 3;  // svg4
-            return 3;
-        }
-        
-        function scrollToSection(sectionIndex) {
-            const maxScroll = document.body.scrollHeight - window.innerHeight;
-            const targetScroll = maxScroll * svgPositions[sectionIndex];
-            
-            window.scrollTo({
-                top: targetScroll,
-                behavior: 'smooth'
-            });
-        }
-        
-        // Gérer le défilement lorsqu'on clique sur les flèches
-        document.getElementById('scrollUp').addEventListener('click', function() {
-            const currentSection = getCurrentSection();
-            // Si on est avant la première section (-1), on ne peut pas remonter
-            if (currentSection === -1) return;
-            const prevSection = Math.max(0, currentSection - 1);
-            scrollToSection(prevSection);
-        });
-
-        document.getElementById('scrollDown').addEventListener('click', function() {
-            const currentSection = getCurrentSection();
-            // Si on est avant la première section (-1), on va à la section 0
-            const nextSection = currentSection === -1 ? 0 : Math.min(3, currentSection + 1);
-            scrollToSection(nextSection);
-        });
-    </script>
-    <script>
-        const chars = "☺Σ×Π#-_¯—→↓↑←0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZ";
-
-        var Glitch = function(selector, index, numberOfGlitchedLetter, timeGlitch, timePerLetter, timeBetweenGlitch) {
-            this.selector = selector;
-            this.index = index;
-            this.numberOfGlitchedLetter = numberOfGlitchedLetter;
-            this.innerText;
-            this.charArray = [];
-            this.charIndex = [];
-            this.timeGlitch = timeGlitch;
-            this.timeBetweenGlitch = timeBetweenGlitch;
-            this.timePerLetter = timePerLetter;
-            this.maxCount = Math.floor(this.timeGlitch / this.timePerLetter);
-            this.count = 0;
-        };
-
-        Glitch.prototype.init = function() {
-            this.innerText = this.selector.innerText;
-            this.charArray = this.innerText.split("");
-            if (this.numberOfGlitchedLetter === undefined || this.numberOfGlitchedLetter > this.innerText.length) {
-                this.numberOfGlitchedLetter = this.innerText.length;
-            }
-            this.defineCharIndexToRandomize();
-        };
-
-        Glitch.prototype.defineCharIndexToRandomize = function() {
-            this.charIndex = [];
-            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
-                let randCharIndex = Math.floor(Math.random() * this.charArray.length);
-                this.charIndex.push(randCharIndex);
-            }
-        };
-
-        Glitch.prototype.randomize = function() {
-            let randomString = Array.from(this.charArray);
-            for (let i = 0; i < this.numberOfGlitchedLetter; i++) {
-                let randIndex = Math.floor(Math.random() * chars.length);
-                let randCharIndex = this.charIndex[i];
-                if (randomString[randCharIndex] !== ' ') {
-                    randomString[randCharIndex] = chars[randIndex];
-                }
-            }
-            this.selector.innerText = randomString.join("");
-        };
-
-        Glitch.prototype.update = function(interval) {
-            if (this.count >= this.maxCount - 1) {
-                this.selector.innerText = this.innerText;
-                this.defineCharIndexToRandomize();
-                let ctx = this;
-                setTimeout(function() {
-                    ctx.count = 0;
-                }, this.timeBetweenGlitch);
-            } else {
-                this.randomize();
-                this.count++;
-            }
-        };
-
-        Glitch.prototype.glitch = function() {
-            let ctx = this;
-            let interval = setInterval(function() {
-                ctx.update(this);
-            }, this.timePerLetter);
-        };
-
-        // Applique l'effet glitch aux éléments du popup lors de son ouverture
-        function initGlitchOnPopup() {
-            const glitchTextElements = document.querySelectorAll("#popup .glitch-text");
-            glitchTextElements.forEach((selector, i) => {
-                let randLetterNumber = 2 + Math.floor(Math.random() * 8);
-                let randGlitchPauseTime = 500 + Math.floor(Math.random() * 2500);
-                let glitch = new Glitch(selector, i, randLetterNumber, 200, 65, randGlitchPauseTime);
-                glitch.init();
-                glitch.glitch(); // Commence l'effet de glitch
-            });
-        }
-
-        document.getElementById('svg4').addEventListener('click', function(event) {
-            event.preventDefault(); // Empêche la navigation par défaut
-            const popup = document.getElementById('popup');
-            popup.style.display = 'flex'; // Affiche le conteneur
-            setTimeout(function() {
-                popup.classList.add('show'); // Ajoute la classe pour l'effet smooth
-                initGlitchOnPopup(); // Démarre le glitch sur le texte du popup
-            }, 10); // Légère attente pour que l'animation soit appliquée correctement
-        });
-
-        document.getElementById('closePopup').addEventListener('click', function() {
-            const popup = document.getElementById('popup');
-            popup.classList.remove('show'); // Retire la classe pour commencer l'animation de fermeture
-            setTimeout(function() {
-                popup.style.display = 'none'; // Cache complètement après l'animation
-            }, 300); // Délai correspondant à la durée de la transition
-        });
-
-        // Fermer le pop-up si on clique en dehors du contenu
-        window.addEventListener('click', function(event) {
-            const popup = document.getElementById('popup');
-            if (event.target === popup) {
-                popup.classList.remove('show');
-                setTimeout(function() {
-                    popup.style.display = 'none';
-                }, 300);
-            }
-        });
-    </script>
-    <script>
+        // ========== STARS CREATION ==========
         function createStars(layerId, numStars, starSize, minTwinkleTime, maxTwinkleTime) {
             const starsContainer = document.getElementById(layerId);
             
@@ -950,7 +788,6 @@
                 starElement.style.top = `${y}px`;
                 starElement.style.left = `${x}px`;
 
-                // Durée et délai d'animation aléatoires
                 const twinkleDuration = Math.random() * (maxTwinkleTime - minTwinkleTime) + minTwinkleTime;
                 const twinkleDelay = Math.random() * twinkleDuration;
                 starElement.style.animationDuration = `${twinkleDuration}s`;
@@ -960,22 +797,107 @@
             }
         }
 
-        // Créer des étoiles optimisées pour meilleures performances
-        createStars('stars1', 30, 1, 0.5, 2); // Petite taille, scintillement rapide
-        createStars('stars2', 25, 2, 1, 3); // Taille moyenne, scintillement modéré
-        createStars('stars3', 20, 3, 1.5, 4); // Grande taille, scintillement plus lent
+        createStars('stars1', 30, 1, 0.5, 2);
+        createStars('stars2', 25, 2, 1, 3);
+        createStars('stars3', 20, 3, 1.5, 4);
     </script>
+    
     <script type="module">
         import * as THREE from '//unpkg.com/three/build/three.module.js';
 
-        // Initialisation du globe avec les nouvelles images
+        // Pin marker SVG
+        const pinSvg = `<svg viewBox="-4 0 36 36">
+            <path fill="currentColor" d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z"></path>
+            <circle fill="black" cx="14" cy="14" r="7"></circle>
+        </svg>`;
+
+        // ========== NAVIGATION DATA ==========
+        const navData = [
+            {
+                lat: 48.8566,   // Paris
+                lng: 2.3522,
+                label: 'Introduction',
+                href: 'page2.html',
+                icon: `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`,
+                color: 'blue'
+            },
+            {
+                lat: 35.6762,   // Tokyo
+                lng: 139.6503,
+                label: 'Compétences',
+                href: 'page1.html',
+                icon: `<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>`,
+                color: 'blue'
+            },
+            {
+                lat: 40.7128,   // New York
+                lng: -74.0060,
+                label: 'Work Gallery',
+                href: 'page3.html',
+                icon: `<svg viewBox="0 0 24 24"><path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg>`,
+                color: 'blue'
+            },
+            {
+                lat: -33.8688,  // Sydney
+                lng: 151.2093,
+                label: 'Mapsterpieces',
+                href: '#popup',
+                icon: `<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+                color: 'red'
+            }
+        ];
+
+        // ========== GLOBE INITIALIZATION ==========
         const world = Globe()
             .globeImageUrl('textures/WEBP/HD/EARTH.webp')
             .bumpImageUrl('textures/WEBP/HD/BUMP.webp')
             .backgroundColor('rgba(0, 0, 0, 0)')
+            .htmlElementsData(navData)
+            .htmlElement(d => {
+                const el = document.createElement('div');
+                el.className = `map-marker ${d.color}`;
+                el.innerHTML = `
+                    <div class="marker-pin">
+                        ${pinSvg}
+                    </div>
+                    <div class="marker-popup">
+                        <div class="marker-popup-content">
+                            <div class="marker-popup-icon">
+                                ${d.icon}
+                            </div>
+                            <span class="marker-popup-label">${d.label}</span>
+                        </div>
+                        <div class="marker-popup-arrow"></div>
+                    </div>
+                `;
+                
+                el.style.pointerEvents = 'auto';
+                el.style.cursor = 'pointer';
+                
+                el.onclick = () => {
+                    if (d.href === '#popup') {
+                        const popup = document.getElementById('popup');
+                        popup.style.display = 'flex';
+                        setTimeout(() => popup.classList.add('show'), 10);
+                    } else {
+                        window.location.href = d.href;
+                    }
+                };
+                
+                return el;
+            })
+            .htmlLat(d => d.lat)
+            .htmlLng(d => d.lng)
+            .htmlAltitude(0.01)
+            .htmlTransitionDuration(0)
             (document.getElementById('globeViz'));
 
-        // Personnalisation du globe avec la texture d'eau et la brillance
+        // Visibility modifier - fade when behind globe
+        world.htmlElementVisibilityModifier((el, isVisible) => {
+            el.style.opacity = isVisible ? 1 : 0;
+        });
+
+        // Customize globe material
         const globeMaterial = world.globeMaterial();
         globeMaterial.bumpScale = 50;
         new THREE.TextureLoader().load('textures/WEBP/HD/EAU.webp', texture => {
@@ -987,130 +909,183 @@
         const directionalLight = world.lights().find(light => light.type === 'DirectionalLight');
         directionalLight && directionalLight.position.set(10, 100, 10);
 
-        // Désactiver les interactions manuelles
+        // Controls
         world.controls().enableZoom = false;
-        world.controls().enableRotate = false;
+        world.controls().autoRotate = true;
+        world.controls().autoRotateSpeed = 0.5;
 
+        // Camera settings
         function updateCameraZoom() {
             if (window.innerWidth <= 768) {
-                // Dézoom sur mobile en augmentant le champ de vision (FOV)
-                world.camera().fov = 75;  // Augmenter le FOV pour un effet de dézoom
+                world.camera().fov = 75;
             } else {
-                // Rétablir le FOV pour les écrans plus grands
-                world.camera().fov = 50;  // FOV par défaut pour un effet normal
+                world.camera().fov = 50;
             }
-            world.camera().updateProjectionMatrix();  // Mise à jour de la projection
+            world.camera().updateProjectionMatrix();
         }
 
-        updateCameraZoom(); // Appel initial
+        updateCameraZoom();
         window.addEventListener('resize', updateCameraZoom);
 
-        // Fonction pour ajuster la taille du globe au redimensionnement de la fenêtre
         function updateGlobeSize() {
             const width = window.innerWidth;
             const height = window.innerHeight;
             world.width(width).height(height);
         }
 
-        updateGlobeSize(); // Initial call
+        updateGlobeSize();
         window.addEventListener('resize', updateGlobeSize);
 
-        // Gestion du défilement pour la rotation du globe
-        window.addEventListener('scroll', () => {
-            const scrollPosition = window.scrollY;
-            const maxScroll = document.body.scrollHeight - window.innerHeight;
-
-            // Calcul de la fraction de défilement
-            const scrollFraction = scrollPosition / maxScroll;
-
-            // Convertir la fraction de défilement en un angle de rotation (de 0 à 360 degrés)
-            const rotationAngle = (scrollFraction * 2 * Math.PI) % (2 * Math.PI);
-
-            // Appliquer la rotation du globe
-            world.controls().autoRotate = false;
-            world.scene().rotation.y = rotationAngle;
-
-            // Fonction pour gérer l'opacité et pointer-events d'un SVG
-            const setSvgVisibility = (elementId, minFraction, maxFraction) => {
-                const element = document.getElementById(elementId);
-                if (scrollFraction > minFraction && scrollFraction < maxFraction) {
-                    element.style.opacity = 1;
-                    element.style.pointerEvents = 'auto';
-                } else {
-                    element.style.opacity = 0;
-                    element.style.pointerEvents = 'none';
-                }
-            };
-
-            // Appliquer la visibilité et les interactions pour chaque SVG avec micro-chevauchement
-            setSvgVisibility('svg1', 0.1, 0.3);
-            setSvgVisibility('svg2', 0.3, 0.5);
-            setSvgVisibility('svg3', 0.5, 0.7);
-            setSvgVisibility('svg4', 0.7, 0.9);
+        // Slow rotation on hover
+        const globeContainer = document.getElementById('globeViz');
+        globeContainer.addEventListener('mouseenter', () => {
+            world.controls().autoRotateSpeed = 0.2;
         });
-    </script>
-    <script>
-        // Rotation du globe en fonction du défilement
-        window.addEventListener('scroll', () => {
-            const scrollPosition = window.scrollY;
-            const maxScroll = document.body.scrollHeight - window.innerHeight;
+        globeContainer.addEventListener('mouseleave', () => {
+            world.controls().autoRotateSpeed = 0.5;
+        });
 
-            // Calculer la fraction de défilement
-            const scrollFraction = scrollPosition / maxScroll;
+        // ========== NAVIGATION CONTROLS ==========
+        let currentIndex = 0;
+        const navCurrent = document.getElementById('navCurrent');
+        const navLabel = navCurrent.querySelector('.nav-label');
+        const navDots = document.querySelectorAll('.nav-dot');
 
-            // Afficher ou masquer les SVG en fonction de la position de défilement
-            document.getElementById('svg1').style.opacity = (scrollFraction > 0.1 && scrollFraction < 0.3) ? 1 : 0;
-            document.getElementById('svg2').style.opacity = (scrollFraction > 0.3 && scrollFraction < 0.5) ? 1 : 0;
-            document.getElementById('svg3').style.opacity = (scrollFraction > 0.5 && scrollFraction < 0.7) ? 1 : 0;
-            document.getElementById('svg4').style.opacity = (scrollFraction > 0.7 && scrollFraction < 0.9) ? 1 : 0;
-
-            // Boucler le défilement
-            if (scrollPosition >= maxScroll - 1) {
-                window.scrollTo(0, 1); // Revenir en haut de la page lorsqu'on atteint le bas
-            } else if (scrollPosition <= 0) {
-                window.scrollTo(0, maxScroll - 1); // Revenir en bas de la page lorsqu'on est en haut
-            }
-
-            if (scrollPosition > 1000) {
-                document.getElementById('scrollBtn').style.opacity = '0';
-                document.getElementById('scrollBtn').style.pointerEvents = 'none'; // Désactive les clics
+        function updateNavUI() {
+            const current = navData[currentIndex];
+            
+            // Update label
+            navLabel.textContent = current.label;
+            
+            // Update special class
+            if (current.color === 'red') {
+                navCurrent.classList.add('special');
             } else {
-                document.getElementById('scrollBtn').style.opacity = '1';
-                document.getElementById('scrollBtn').style.pointerEvents = 'auto'; // Réactive les clics
+                navCurrent.classList.remove('special');
             }
+            
+            // Update dots
+            navDots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        function goToDestination(index) {
+            currentIndex = index;
+            const dest = navData[currentIndex];
+            
+            // Stop auto-rotation temporarily
+            world.controls().autoRotate = false;
+            
+            // Fly to destination
+            world.pointOfView({
+                lat: dest.lat,
+                lng: dest.lng,
+                altitude: 2.5
+            }, 1000);
+            
+            // Resume auto-rotation after animation
+            setTimeout(() => {
+                world.controls().autoRotate = true;
+                world.controls().autoRotateSpeed = 0.3;
+            }, 1200);
+            
+            updateNavUI();
+        }
+
+        function nextDestination() {
+            const newIndex = (currentIndex + 1) % navData.length;
+            goToDestination(newIndex);
+        }
+
+        function prevDestination() {
+            const newIndex = (currentIndex - 1 + navData.length) % navData.length;
+            goToDestination(newIndex);
+        }
+
+        function visitCurrentDestination() {
+            const current = navData[currentIndex];
+            if (current.href === '#popup') {
+                const popup = document.getElementById('popup');
+                popup.style.display = 'flex';
+                setTimeout(() => popup.classList.add('show'), 10);
+            } else {
+                window.location.href = current.href;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('navPrev').addEventListener('click', prevDestination);
+        document.getElementById('navNext').addEventListener('click', nextDestination);
+        navCurrent.addEventListener('click', visitCurrentDestination);
+
+        // Dots click
+        navDots.forEach((dot, i) => {
+            dot.addEventListener('click', () => goToDestination(i));
         });
 
-        // Ajout du texte tournant
-        const textElements = document.querySelectorAll('#text');
-        textElements.forEach((textElement) => {
-            const rotate = new CircleType(textElement);
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevDestination();
+            if (e.key === 'ArrowRight') nextDestination();
+            if (e.key === 'Enter') visitCurrentDestination();
+        });
 
-            function updateTextSize() {
-                const formWidth = textElement.closest('.une-forme').clientWidth;
-                const maxRadius = 90; // Définir un rayon maximum en pixels pour limiter la taille
-                const newRadius = Math.min(formWidth * 0.4, maxRadius); // Limitez le rayon au maximum défini
-                rotate.radius(newRadius);
-                textElement.style.fontSize = `${formWidth * 0.1}px`; // Ajuste la taille de la police proportionnellement
+        // Swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left -> next
+                    nextDestination();
+                } else {
+                    // Swipe right -> previous
+                    prevDestination();
+                }
             }
+        }
 
-            updateTextSize(); // Initial call to set sizes
+        // Initialize
+        updateNavUI();
+    </script>
+    
+    <script>
+        // ========== POPUP HANDLING ==========
+        document.getElementById('closePopup').addEventListener('click', function() {
+            const popup = document.getElementById('popup');
+            popup.classList.remove('show');
+            setTimeout(function() {
+                popup.style.display = 'none';
+            }, 300);
+        });
 
-            window.addEventListener('resize', updateTextSize); // Update on window resize
-
-            function rotateText() {
-                let degree = 0;
-                setInterval(() => {
-                    degree += 1;
-                    textElement.style.transform = 'rotate(' + degree + 'deg)';
-                }, 10);
+        window.addEventListener('click', function(event) {
+            const popup = document.getElementById('popup');
+            if (event.target === popup) {
+                popup.classList.remove('show');
+                setTimeout(function() {
+                    popup.style.display = 'none';
+                }, 300);
             }
-
-            rotateText(); // Initialiser l'animation de rotation
         });
     </script>
 
     <script>
-        // Preloader system
+        // ========== PRELOADER ==========
         (function() {
             const loaderScreen = document.getElementById('loaderScreen');
             const loaderBar = document.getElementById('loaderBar');
@@ -1119,9 +1094,7 @@
             let loadedCount = 0;
             let totalCount = 0;
             
-            // Liste des ressources critiques à précharger
             const resourcesToPreload = [
-                // Textures Globe
                 'textures/WEBP/HD/EARTH.webp',
                 'textures/WEBP/HD/BUMP.webp',
                 'textures/WEBP/HD/EAU.webp',
@@ -1130,11 +1103,9 @@
                 'textures/WEBP/DATA.webp',
                 'textures/MOI3.webp',
                 'textures/MOICREEPY.webp',
-                // Pages HTML
                 'page1.html',
                 'page2.html',
                 'page3.html',
-                // Works images
                 'works/Huntsterpieces/hunsterpiece_preview.png',
                 'works/Bigfoot/images/preview.png',
                 'works/LightHouse/LightHouses.png',
@@ -1149,7 +1120,6 @@
                 loaderBar.style.width = percentage + '%';
                 loaderPercentage.textContent = percentage + '%';
                 
-                // Une fois à 100%, attendre 500ms puis masquer
                 if (loadedCount >= totalCount) {
                     setTimeout(() => {
                         loaderScreen.classList.add('hidden');
@@ -1166,7 +1136,7 @@
                         resolve();
                     };
                     img.onerror = () => {
-                        loadedCount++; // Compte quand même pour ne pas bloquer
+                        loadedCount++;
                         updateProgress();
                         resolve();
                     };
@@ -1186,7 +1156,6 @@
                     });
             }
             
-            // Précharger toutes les ressources
             Promise.all(resourcesToPreload.map(url => {
                 if (url.endsWith('.html')) {
                     return preloadHTML(url);
@@ -1195,7 +1164,6 @@
                 }
             }));
             
-            // Fallback: masquer après 10 secondes maximum
             setTimeout(() => {
                 if (!loaderScreen.classList.contains('hidden')) {
                     loaderScreen.classList.add('hidden');
