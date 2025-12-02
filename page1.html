@@ -29,17 +29,12 @@
             background: linear-gradient(#000000 0%, #1a1a4e 50%, #2cb5e8 100%);
             font-family: "Space Mono", monospace;
             font-weight: 700;
-            overflow: hidden; /* Desktop only */
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
             cursor: url('icon/svg/cursor.svg'), pointer;
-        }
-        
-        /* Enable scroll on mobile */
-        @media only screen and (max-width: 768px) {
-            body, html {
-                overflow-y: auto;
-                overflow-x: hidden;
-                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            }
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling */
         }
 
         /* Navigation points */
@@ -107,42 +102,20 @@
             height: 500px;
             z-index: 1;
             opacity: 0.4;
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            filter: blur(0px);
-        }
-        
-        .globe-container.changing {
-            opacity: 0.15;
-            filter: blur(3px);
-            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Skills sections */
         .skills-section {
-            position: fixed;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100%;
-            height: 100%;
+            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateY(20px);
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
             z-index: 2;
-        }
-
-        .skills-section.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
-        }
-        
-        .skills-section.leaving {
-            opacity: 0;
-            transform: translateY(-20px);
         }
 
         .skills-content {
@@ -167,24 +140,18 @@
             transform: translateY(20px);
         }
         
-        .skills-section.active .skill-card {
+        .skill-card.animate {
             opacity: 1;
             transform: translateY(0);
         }
         
-        /* Précharge le blur pour éviter le délai */
-        .skills-section {
-            backdrop-filter: blur(0px);
-            -webkit-backdrop-filter: blur(0px);
-        }
-        
-        .skills-section.active .skill-card:nth-child(1) { transition-delay: 0.05s; }
-        .skills-section.active .skill-card:nth-child(2) { transition-delay: 0.1s; }
-        .skills-section.active .skill-card:nth-child(3) { transition-delay: 0.15s; }
-        .skills-section.active .skill-card:nth-child(4) { transition-delay: 0.2s; }
-        .skills-section.active .skill-card:nth-child(5) { transition-delay: 0.25s; }
-        .skills-section.active .skill-card:nth-child(6) { transition-delay: 0.3s; }
-        .skills-section.active .skill-card:nth-child(7) { transition-delay: 0.35s; }
+        .skill-card.animate:nth-child(2) { transition-delay: 0.05s; }
+        .skill-card.animate:nth-child(3) { transition-delay: 0.1s; }
+        .skill-card.animate:nth-child(4) { transition-delay: 0.15s; }
+        .skill-card.animate:nth-child(5) { transition-delay: 0.2s; }
+        .skill-card.animate:nth-child(6) { transition-delay: 0.25s; }
+        .skill-card.animate:nth-child(7) { transition-delay: 0.3s; }
+        .skill-card.animate:nth-child(8) { transition-delay: 0.35s; }
 
         .skill-card:hover {
             background: rgba(255, 255, 255, 0.1);
@@ -236,17 +203,11 @@
             font-size: 2.5rem;
             margin-bottom: 20px;
             text-shadow: 0 0 20px rgba(139, 211, 244, 0.5);
-            opacity: 0;
-            transform: translateY(-20px);
+            opacity: 1;
+            transform: translateY(0);
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: "Space Mono", monospace;
             font-weight: 700;
-        }
-        
-        .skills-section.active .section-title {
-            opacity: 1;
-            transform: translateY(0);
-            transition-delay: 0s;
         }
 
         /* Variantes de couleur pour les titres */
@@ -349,52 +310,25 @@
 
         /* Mobile responsiveness */
         @media only screen and (max-width: 768px) {
-            /* Enable natural scrolling on mobile */
-            .skills-section {
-                position: relative !important; /* Override fixed positioning */
-                opacity: 1 !important; /* Always visible */
-                pointer-events: auto !important;
-                transform: none !important;
-                height: 100vh; /* Each section takes full height */
-                min-height: 100vh;
-                display: flex !important;
-                scroll-snap-align: start; /* Snap to sections when scrolling */
-            }
-            
-            body {
-                scroll-snap-type: y mandatory; /* Enable scroll snapping */
-            }
-            
             /* Globe stays fixed in background */
             .globe-container {
-                position: fixed !important;
                 width: 300px;
                 height: 300px;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                z-index: 0; /* Behind content */
             }
             
             .skills-content {
                 grid-template-columns: 1fr;
                 gap: 8px;
                 padding: 10px 15px;
-                z-index: 2; /* Above globe */
-                position: relative;
             }
 
             .section-title {
                 font-size: 1.4rem;
                 margin-bottom: 10px;
-                opacity: 1 !important;
-                transform: none !important;
             }
             
             .skill-card {
                 padding: 10px 12px;
-                opacity: 1 !important;
-                transform: none !important;
             }
             
             .skill-card h3 {
@@ -738,10 +672,6 @@
         ];
         let currentSection = 0;
         let world;
-        let isTransitioning = false;
-        
-        // Detect if mobile
-        const isMobile = window.innerWidth <= 768;
 
         // Précharger toutes les textures du globe
         function preloadTextures() {
@@ -778,169 +708,68 @@
         // Précharger les textures avant d'initialiser
         preloadTextures();
 
-        // Change section
-        function changeSection(index) {
-            if (index === currentSection) return;
-
-            // On mobile, use native scroll
-            if (isMobile) {
-                sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
-                navDots[currentSection].classList.remove('active');
-                navDots[index].classList.add('active');
-                currentSection = index;
-                
-                // Change globe texture on mobile too
-                if (world) {
-                    world.globeImageUrl(globeTextures[index]);
-                }
-                return;
-            }
-
-            // Desktop: use transitions
-            const globeContainer = document.getElementById('globeViz');
-            
-            // Add leaving animation to current section
-            sections[currentSection].classList.add('leaving');
-            navDots[currentSection].classList.remove('active');
-            
-            // Dim globe and speed up rotation
-            globeContainer.classList.add('changing');
-            world.controls().autoRotateSpeed = 8; // Rotation rapide
-            
-            // Remove old section after transition starts
-            setTimeout(() => {
-                sections[currentSection].classList.remove('active', 'leaving');
-                sections[currentSection].querySelectorAll('.skill-card').forEach(card => {
-                    card.classList.remove('animate');
-                });
-                
-                // Change globe texture au milieu de la rotation rapide
-                setTimeout(() => {
-                    world.globeImageUrl(globeTextures[index]);
-                }, 200);
-                
-                // Show new section
-                sections[index].classList.add('active');
-                navDots[index].classList.add('active');
-                
-                // Restore globe opacity and slow down rotation
-                setTimeout(() => {
-                    world.controls().autoRotateSpeed = 0.5; // Retour à vitesse normale
-                    setTimeout(() => {
-                        globeContainer.classList.remove('changing');
-                    }, 100);
-                }, 500);
-                
-                // Animate skill bars
-                setTimeout(() => {
-                    sections[index].querySelectorAll('.skill-card').forEach(card => {
-                        card.classList.add('animate');
-                    });
-                }, 400);
-                
-            }, 400);
-
-            currentSection = index;
-        }
-
-        // Navigation dots click
+        // Navigation dots click - scroll to section
         navDots.forEach((dot, index) => {
             dot.addEventListener('click', () => {
-                if (isTransitioning) return;
-                isTransitioning = true;
-                changeSection(index);
-                setTimeout(() => { isTransitioning = false; }, 1000);
+                sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
 
-        // Keyboard navigation (desktop only)
-        if (!isMobile) {
-            document.addEventListener('keydown', (e) => {
-                if (isTransitioning) return;
-                
-                if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                    isTransitioning = true;
-                    const next = (currentSection + 1) % sections.length;
-                    changeSection(next);
-                    setTimeout(() => { isTransitioning = false; }, 1000);
-                } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                    isTransitioning = true;
-                    const prev = (currentSection - 1 + sections.length) % sections.length;
-                    changeSection(prev);
-                    setTimeout(() => { isTransitioning = false; }, 1000);
+        // Keyboard navigation - scroll to next/prev section
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                const next = (currentSection + 1) % sections.length;
+                sections[next].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prev = (currentSection - 1 + sections.length) % sections.length;
+                sections[prev].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        // Track scroll position to update nav dots and globe texture
+        const observerOptions = {
+            root: null,
+            threshold: 0.5 // Section is considered active when 50% visible
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const index = Array.from(sections).indexOf(entry.target);
+                    if (index !== -1 && index !== currentSection) {
+                        navDots[currentSection].classList.remove('active');
+                        currentSection = index;
+                        navDots[currentSection].classList.add('active');
+                        
+                        // Change globe texture when scrolling into view
+                        if (world) {
+                            world.globeImageUrl(globeTextures[index]);
+                        }
+                        
+                        // Animate skill cards when section becomes visible
+                        const skillCards = entry.target.querySelectorAll('.skill-card');
+                        skillCards.forEach(card => {
+                            card.classList.add('animate');
+                        });
+                    }
                 }
             });
-
-            // Mouse wheel navigation (desktop only)
-            let wheelTimeout;
-            document.addEventListener('wheel', (e) => {
-                if (isTransitioning) return;
-                
-                clearTimeout(wheelTimeout);
-                wheelTimeout = setTimeout(() => {
-                    isTransitioning = true;
-                    if (e.deltaY > 0) {
-                        const next = (currentSection + 1) % sections.length;
-                        changeSection(next);
-                    } else {
-                        const prev = (currentSection - 1 + sections.length) % sections.length;
-                        changeSection(prev);
-                    }
-                    setTimeout(() => {
-                        isTransitioning = false;
-                    }, 1000);
-                }, 50);
-            });
-        } else {
-            // Mobile: track scroll position to update nav dots
-            const observerOptions = {
-                root: null,
-                threshold: 0.5 // Section is considered active when 50% visible
-            };
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const index = Array.from(sections).indexOf(entry.target);
-                        if (index !== -1 && index !== currentSection) {
-                            navDots[currentSection].classList.remove('active');
-                            currentSection = index;
-                            navDots[currentSection].classList.add('active');
-                            
-                            // Change globe texture when scrolling into view
-                            if (world) {
-                                world.globeImageUrl(globeTextures[index]);
-                            }
-                        }
-                    }
-                });
-            }, observerOptions);
-            
-            // Observe all sections
-            sections.forEach(section => observer.observe(section));
-        }
+        }, observerOptions);
+        
+        // Observe all sections
+        sections.forEach(section => observer.observe(section));
 
         // Initialize
         initGlobe();
         
-        // Animate sections
-        if (isMobile) {
-            // On mobile, animate all sections immediately since they're all visible when scrolling
-            setTimeout(() => {
-                sections.forEach(section => {
-                    section.querySelectorAll('.skill-card').forEach(card => {
-                        card.classList.add('animate');
-                    });
-                });
-            }, 500);
-        } else {
-            // On desktop, only animate first section
-            setTimeout(() => {
-                sections[0].querySelectorAll('.skill-card').forEach(card => {
-                    card.classList.add('animate');
-                });
-            }, 500);
-        }
+        // Animate first section immediately
+        setTimeout(() => {
+            sections[0].querySelectorAll('.skill-card').forEach(card => {
+                card.classList.add('animate');
+            });
+        }, 500);
     </script>
 
     <script>
